@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   -
+   - Copyright (C) 2015 Namit Bhalla (oyenamit@gmail.com)
+   - This file is part of 'Fat-Free Firefox' extension for the Firefox browser.
+
+   - This program is free software: you can redistribute it and/or modify
+   - it under the terms of the GNU General Public License as published by
+   - the Free Software Foundation, either version 3 of the License, or
+   - any later version.
+   -
+   - This program is distributed in the hope that it will be useful,
+   - but WITHOUT ANY WARRANTY; without even the implied warranty of
+   - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   - GNU General Public License for more details.
+
+   - You should have received a copy of the GNU General Public License
+   - along with this program. If not, see <http://www.gnu.org/licenses/>.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+
+<!DOCTYPE overlay SYSTEM "chrome://fat-free-firefox/locale/fat-free-firefox.dtd"> 
+
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <setting pref="extensions.fat-free-firefox.disable-pocket"
+             type="bool" 
+             title="&fat-free-firefox.prefs.disablePocket;" 
+             desc="&fat-free-firefox.prefs.requiresRestartEx;"/>
+
+    <setting pref="loop.enabled"
+             type="bool" 
+             inverted="true" 
+             title="&fat-free-firefox.prefs.disableHello;" 
+             desc="&fat-free-firefox.prefs.requiresRestart;"/>
+
+    <setting pref="reader.parse-on-load.enabled" 
+             type="bool" 
+             inverted="true" 
+             title="&fat-free-firefox.prefs.disableReader;"
+             desc="&fat-free-firefox.prefs.requiresNoRestartReader;"/>
+
+</vbox>
+

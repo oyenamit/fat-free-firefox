@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   -
+   - Copyright (C) 2015 Namit Bhalla (oyenamit@gmail.com)
+   - This file is part of 'Fat-Free Firefox' extension for the Firefox browser.
+
+   - This program is free software: you can redistribute it and/or modify
+   - it under the terms of the GNU General Public License as published by
+   - the Free Software Foundation, either version 3 of the License, or
+   - any later version.
+   -
+   - This program is distributed in the hope that it will be useful,
+   - but WITHOUT ANY WARRANTY; without even the implied warranty of
+   - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   - GNU General Public License for more details.
+
+   - You should have received a copy of the GNU General Public License
+   - along with this program. If not, see <http://www.gnu.org/licenses/>.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+
+      <em:id>fat-free-firefox@oyenamit</em:id>
+      <em:name>Fat-Free Firefox</em:name>
+      <em:description>Disable unwanted features of Firefox like Pocket, Hello and Reader View</em:description>
+      <em:version>0.1</em:version>
+      <em:creator>oyenamit</em:creator>
+      <em:iconURL>chrome://fat-free-firefox/skin/fat-free-firefox-icon.png</em:iconURL>
+      <em:icon64URL>chrome://fat-free-firefox/skin/fat-free-firefox-icon64.png</em:icon64URL>
+      <em:type>2</em:type>
+      <em:bootstrap>true</em:bootstrap>
+      <em:optionsType>2</em:optionsType>
+      <em:optionsURL>chrome://fat-free-firefox/content/preferences.xul</em:optionsURL>
+
+      <!-- Firefox support -->
+      <em:targetApplication>
+          <Description>
+              <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+              <em:minVersion>29.0</em:minVersion>
+              <em:maxVersion>40.*</em:maxVersion>
+          </Description>
+      </em:targetApplication>
+
+      <!-- US English localization -->
+      <em:localized>
+          <Description>
+              <em:locale>en-US</em:locale>
+              <em:name>Fat-Free Firefox</em:name>
+              <em:description>Disable unwanted features of Firefox like Pocket, Hello and Reader View</em:description>
+              <em:creator>oyenamit</em:creator>
+              <em:translator>oyenamit</em:translator>
+          </Description>
+      </em:localized>
+  </Description>
+</RDF>
+
