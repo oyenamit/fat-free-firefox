@@ -22,7 +22,11 @@
 <!ENTITY fat-free-firefox.prefs.disablePocket               "Disable Pocket">
 <!ENTITY fat-free-firefox.prefs.disableHello                "Disable Hello">
 <!ENTITY fat-free-firefox.prefs.disableReader               "Disable Reader View">
+<!ENTITY fat-free-firefox.prefs.disableSpeculativeConn      "Disable Speculative Connections">
+<!ENTITY fat-free-firefox.prefs.requiresNoRestart           "(change will be effective immediately. No restart required)">
 <!ENTITY fat-free-firefox.prefs.requiresRestart             "(change will be effective after you restart Firefox)">
 <!ENTITY fat-free-firefox.prefs.requiresRestartEx           "(change will be fully effective after you restart Firefox)">
 <!ENTITY fat-free-firefox.prefs.requiresNoRestartReader     "(change will be effective immediately. Just reload currently open sites)">
+<!ENTITY fat-free-firefox.prefs.docTitle                    "Read more about the supported features">
+<!ENTITY fat-free-firefox.prefs.docDesc                     "(privacy implications and other possible reasons to disable them)">
 

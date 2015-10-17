@@ -26,6 +26,19 @@
 
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+    <setting type="control" 
+             title="&fat-free-firefox.prefs.docTitle;"
+             desc="&fat-free-firefox.prefs.docDesc;">
+             <button id="fat-free-firefox-doc"
+                     label="..."
+                     oncommand="Components.utils.import('resource://gre/modules/Services.jsm'); Services.wm.getMostRecentWindow('navigator:browser').gBrowser.selectedTab = Services.wm.getMostRecentWindow('navigator:browser').gBrowser.addTab('chrome://fat-free-firefox/content/doc.html', {relatedToCurrent: true});"/>
+    </setting>
+
+    <setting pref="extensions.fat-free-firefox.disable-speculative-connections"
+             type="bool" 
+             title="&fat-free-firefox.prefs.disableSpeculativeConn;" 
+             desc="&fat-free-firefox.prefs.requiresNoRestart;"/>    
+
     <setting pref="extensions.fat-free-firefox.disable-pocket"
              type="bool" 
              title="&fat-free-firefox.prefs.disablePocket;" 
