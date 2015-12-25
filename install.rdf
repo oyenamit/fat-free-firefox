@@ -28,8 +28,8 @@
 
       <em:id>fat-free-firefox@oyenamit</em:id>
       <em:name>Fat-Free Firefox</em:name>
-      <em:description>Disable unwanted features of Firefox like Pocket, Speculative Connections, Hello and Reader View</em:description>
-      <em:version>1.0</em:version>
+      <em:description>Safeguard your private information by disabling privacy-violating features of Firefox and by enabling tracking protection from third-party ads. Keep your browser fat-free by disabling some of its unwanted features.</em:description>
+      <em:version>2.0</em:version>
       <em:creator>oyenamit</em:creator>
       <em:iconURL>chrome://fat-free-firefox/skin/fat-free-firefox-icon.png</em:iconURL>
       <em:icon64URL>chrome://fat-free-firefox/skin/fat-free-firefox-icon64.png</em:icon64URL>
@@ -43,7 +43,7 @@
           <Description>
               <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
               <em:minVersion>29.0</em:minVersion>
-              <em:maxVersion>44.*</em:maxVersion>
+              <em:maxVersion>46.0</em:maxVersion>
           </Description>
       </em:targetApplication>
 
@@ -52,7 +52,7 @@
           <Description>
               <em:locale>en-US</em:locale>
               <em:name>Fat-Free Firefox</em:name>
-              <em:description>Disable unwanted features of Firefox like Pocket, Speculative Connections, Hello and Reader View</em:description>
+              <em:description>Safeguard your private information by disabling privacy-violating features of Firefox and by enabling tracking protection from third-party ads. Keep your browser fat-free by disabling some of its unwanted features.</em:description>
               <em:creator>oyenamit</em:creator>
               <em:translator>oyenamit</em:translator>
           </Description>

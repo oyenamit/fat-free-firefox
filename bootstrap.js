@@ -26,13 +26,28 @@
 "use strict";
 
 
+var reasons  = ["", "APP_STARTUP", "APP_SHUTDOWN", "ADDON_ENABLE", "ADDON_DISABLE", "ADDON_INSTALL", "ADDON_UNINSTALL", "ADDON_UPGRADE", "ADDON_DOWNGRADE"];
+
+
+var this_scope = {
+                    ADDON_ENABLE:     ADDON_ENABLE, 
+                    ADDON_INSTALL:    ADDON_INSTALL, 
+                    ADDON_UPGRADE:    ADDON_UPGRADE, 
+                    ADDON_DOWNGRADE:  ADDON_DOWNGRADE, 
+                    ADDON_DISABLE:    ADDON_DISABLE, 
+                    ADDON_UNINSTALL:  ADDON_UNINSTALL, 
+                    APP_SHUTDOWN:     APP_SHUTDOWN, 
+                    console:          console 
+                };
+
+
 // -----------------------------------------------------------------------------
 // Standard entry point for bootstrapped extensions called by the browser.
 // -----------------------------------------------------------------------------
 function install( data, reason )
 {
     // Nothing needs to be done on installation.
-    
+
     // -------------------------------------------------------------------------
     // NSFatFreeFirefox is not available here so we cannot call
     // NSFatFreeFirefox.onInstall().
@@ -47,9 +62,9 @@ function install( data, reason )
 function startup( data, reason )
 {
     // This is the earliest where NSFatFreeFirefox is available.
-    Components.utils.import( "chrome://fat-free-firefox/content/fat-free-firefox.jsm", this );
-    
-    NSFatFreeFirefox.onStartup( data, reason, this );
+    Components.utils.import( "chrome://fat-free-firefox/content/fat-free-firefox.jsm" );
+
+    NSFatFreeFirefox.onStartup( data, reason, this_scope );
 }
 
 
@@ -71,7 +86,7 @@ function shutdown( data, reason )
 function uninstall( data, reason )
 {
     // Nothing needs to be done on uninstallation.
-    
+
     // -------------------------------------------------------------------------
     // NSFatFreeFirefox will not be available here since we are unloading the 
     // jsm in shutdown()

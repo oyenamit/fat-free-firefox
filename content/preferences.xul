@@ -31,9 +31,48 @@
              desc="&fat-free-firefox.prefs.docDesc;">
              <button id="fat-free-firefox-doc"
                      label="..."
-                     oncommand="Components.utils.import('resource://gre/modules/Services.jsm'); Services.wm.getMostRecentWindow('navigator:browser').gBrowser.selectedTab = Services.wm.getMostRecentWindow('navigator:browser').gBrowser.addTab('chrome://fat-free-firefox/content/doc.html', {relatedToCurrent: true});"/>
+                     oncommand="Components.utils.import('resource://gre/modules/Services.jsm'); Services.wm.getMostRecentWindow('navigator:browser').gBrowser.selectedTab = Services.wm.getMostRecentWindow('navigator:browser').gBrowser.addTab('chrome://fat-free-firefox/locale/doc.html', {relatedToCurrent: true});"/>
     </setting>
 
+    <setting pref="browser.urlbar.unifiedcomplete"
+             type="bool" 
+             inverted="true" 
+             title="&fat-free-firefox.prefs.disableUnifiedComplete;" 
+             desc="&fat-free-firefox.prefs.unifiedCompleteDesc;"/>
+
+    <setting pref="dom.push.enabled"
+             type="bool" 
+             inverted="true" 
+             title="&fat-free-firefox.prefs.disablePushNotifications;" 
+             desc="&fat-free-firefox.prefs.pushNotificationsDesc;"/>
+
+    <setting pref="privacy.trackingprotection.enabled"
+             type="bool" 
+             title="&fat-free-firefox.prefs.enableTrackingProtection;" 
+             desc="&fat-free-firefox.prefs.trackingProtectionDesc;"/>
+       
+    <setting pref="media.peerconnection.ice.default_address_only"
+             type="bool" 
+             title="&fat-free-firefox.prefs.disableWebRTCLeak;" 
+             desc="&fat-free-firefox.prefs.requiresNoRestartReload;"/>
+
+    <setting pref="beacon.enabled"
+             type="bool" 
+             inverted="true" 
+             title="&fat-free-firefox.prefs.disableBeacon;" 
+             desc="&fat-free-firefox.prefs.requiresNoRestart;"/>
+       
+    <setting pref="network.prefetch-next"
+             type="bool" 
+             inverted="true" 
+             title="&fat-free-firefox.prefs.disableLinkPrefetch;" 
+             desc="&fat-free-firefox.prefs.requiresNoRestart;"/>
+
+    <setting pref="network.dns.disablePrefetch"
+             type="bool" 
+             title="&fat-free-firefox.prefs.disableDNSPrefetch;" 
+             desc="&fat-free-firefox.prefs.requiresNoRestart;"/>
+    
     <setting pref="extensions.fat-free-firefox.disable-speculative-connections"
              type="bool" 
              title="&fat-free-firefox.prefs.disableSpeculativeConn;" 
@@ -54,7 +93,7 @@
              type="bool" 
              inverted="true" 
              title="&fat-free-firefox.prefs.disableReader;"
-             desc="&fat-free-firefox.prefs.requiresNoRestartReader;"/>
+             desc="&fat-free-firefox.prefs.requiresNoRestartReload;"/>
 
 </vbox>
 

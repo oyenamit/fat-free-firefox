@@ -51,19 +51,25 @@ if( typeof NSFatFreeFirefox === 'undefined' )
 // ---------------------------------------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.PREF_FFF_TREE                  = "extensions.fat-free-firefox.";
-NSFatFreeFirefox.PREF_FFF_DISABLE_POCKET        = "disable-pocket";
-NSFatFreeFirefox.PREF_FFF_POCKET_AREA           = "pocket-area";
-NSFatFreeFirefox.PREF_FFF_POCKET_POSITION       = "pocket-position";
-NSFatFreeFirefox.PREF_FFF_DISABLE_SPEC_CONN     = "disable-speculative-connections";
-NSFatFreeFirefox.PREF_BUILTIN_POCKET_ENABLED    = "browser.pocket.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_READER_ENABLED    = "reader.parse-on-load.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_HELLO_ENABLED     = "loop.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_SPEC_CONN         = "network.http.speculative-parallel-limit";
-NSFatFreeFirefox.POCKET_WIDGET                  = "pocket-button";
-NSFatFreeFirefox.SPEC_CONN_DEF_VAL              = 6;
-NSFatFreeFirefox.SPEC_CONN_OFF_VAL              = 0;
-NSFatFreeFirefox.LOG_MSG_PREFIX                 = "fat-free-firefox 1.0: ";
+NSFatFreeFirefox.PREF_FFF_TREE                      = "extensions.fat-free-firefox.";
+NSFatFreeFirefox.PREF_FFF_DISABLE_POCKET            = "disable-pocket";
+NSFatFreeFirefox.PREF_FFF_POCKET_AREA               = "pocket-area";
+NSFatFreeFirefox.PREF_FFF_POCKET_POSITION           = "pocket-position";
+NSFatFreeFirefox.PREF_FFF_DISABLE_SPEC_CONN         = "disable-speculative-connections";
+NSFatFreeFirefox.PREF_BUILTIN_POCKET_ENABLED        = "browser.pocket.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_READER_ENABLED        = "reader.parse-on-load.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_HELLO_ENABLED         = "loop.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_SPEC_CONN             = "network.http.speculative-parallel-limit";
+NSFatFreeFirefox.PREF_BUILTIN_DNS_PREFETCH          = "network.dns.disablePrefetch";
+NSFatFreeFirefox.PREF_BUILTIN_LINK_PREFETCH         = "network.prefetch-next";
+NSFatFreeFirefox.PREF_BUILTIN_PUSH_NOTIFICATIONS    = "dom.push.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_WEB_RTC_LEAK          = "media.peerconnection.ice.default_address_only";
+NSFatFreeFirefox.PREF_BUILTIN_TRACKING_PROTECTION   = "privacy.trackingprotection.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_BEACON                = "beacon.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_UNIFIED_COMPL         = "browser.urlbar.unifiedcomplete";
+NSFatFreeFirefox.POCKET_WIDGET                      = "pocket-button";
+NSFatFreeFirefox.SPEC_CONN_OFF_VAL                  = 0;
+NSFatFreeFirefox.LOG_MSG_PREFIX                     = "fat-free-firefox 2.0: ";
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -116,18 +122,10 @@ NSFatFreeFirefox.onStartup = function( data, reason, outer )
     // We must randomize the URI due to bug# 719376.
     this.stringBundle = Services.strings.createBundle( "chrome://fat-free-firefox/locale/fat-free-firefox.properties?" + Math.random() );
 
-    if( (reason === outer.ADDON_ENABLE) || (reason === outer.ADDON_INSTALL) )
+    if( (reason === outer.ADDON_ENABLE )  || (reason === outer.ADDON_INSTALL    ) ||
+        (reason === outer.ADDON_UPGRADE)  || (reason === outer.ADDON_DOWNGRADE) )
     {
         this.setDefaultPrefs();
-    }
-
-    if( reason === outer.ADDON_UPGRADE )
-    {
-        // -------------------------------------------------------------------------------------------------
-        // New preference added in this version will not get its default value set in setDefaultPrefs()
-        // We need to do it specifically for the ADD_UPGRADE case.
-        // -------------------------------------------------------------------------------------------------
-        Services.prefs.setBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN, false );
     }
 
 
@@ -135,10 +133,10 @@ NSFatFreeFirefox.onStartup = function( data, reason, outer )
     {
         // -------------------------------------------------------------------------------------------------
         // When a fresh install or upgrade happens, display the documentation page to the user.
-        // I don't think I want to show it when downgrade happens.
+        // Don't show it when downgrade happens.
         // -------------------------------------------------------------------------------------------------
         var aDOMWindow                  = Services.wm.getMostRecentWindow( 'navigator:browser' );
-        aDOMWindow.gBrowser.selectedTab = aDOMWindow.gBrowser.addTab( "chrome://fat-free-firefox/content/doc.html", {relatedToCurrent: true} );
+        aDOMWindow.gBrowser.selectedTab = aDOMWindow.gBrowser.addTab( "chrome://fat-free-firefox/locale/doc.html", {relatedToCurrent: true} );
     }
 
     this.prefBranch = Services.prefs.getBranch( this.PREF_FFF_TREE );
@@ -159,10 +157,21 @@ NSFatFreeFirefox.onShutdown = function( data, reason )
 
         if( (reason === this.outer.ADDON_DISABLE) || (reason === this.outer.ADDON_UNINSTALL) )
         {
+            // ------------------------------------------------------------------------------
+            // Extension is about to be disabled/uninstalled.
+            // Revert all supported features to their default values.
+            // ------------------------------------------------------------------------------
             this.enablePocket();
             this.enableReader();
             this.enableHello();
             this.enableSpecConn();
+            this.enableDNSPrefetch();
+            this.enableLinkPrefetch();
+            this.enablePushNotifications();
+            this.enableWebRTCLeak();
+            this.disableTrackingProtection();
+            this.enableBeacon();
+            this.enableUnifiedCompl();
 
             this.deleteAllPrefs();
 
@@ -177,14 +186,36 @@ NSFatFreeFirefox.onShutdown = function( data, reason )
             // User is downgrading to an older version. We need to remove the preferences added in the current
             // version and also enable the corresponding features.
             // -------------------------------------------------------------------------------------------------
-            this.enableSpecConn();
-            Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN );
+            if( data.newVersion < 1.0 )
+            {
+                // ---------------------------------------------------------------------------------------------
+                // Support for Speculative Connections was added in v1.0
+                // If we are being downgraded to a version below that, we need to enable it again.
+                // ---------------------------------------------------------------------------------------------
+                this.enableSpecConn();
+                Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN );
+            }
+
+            if( data.newVersion < 2.0 )
+            {
+                // ---------------------------------------------------------------------------------------------
+                // Support for these features was added in v2.0
+                // If we are being downgraded to a version below that, we need to reset them to their default
+                // values.
+                // ---------------------------------------------------------------------------------------------
+                this.enableDNSPrefetch();
+                this.enableLinkPrefetch();
+                this.enablePushNotifications();
+                this.enableWebRTCLeak();
+                this.disableTrackingProtection();
+                this.enableBeacon();
+                this.enableUnifiedCompl();
+            }
         }
 
         this.outer = null;
     }
 };
-
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -240,7 +271,7 @@ NSFatFreeFirefox.enablePocket = function()
         lastPocketArea      = Services.prefs.getCharPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
         lastPocketPosition  = Services.prefs.getIntPref ( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );
     }
-    catch( err )
+    catch( errLast )
     {
         // Trying to get non-existent prefs throws an exception.
         // Nothing to do here.
@@ -248,15 +279,17 @@ NSFatFreeFirefox.enablePocket = function()
 
     if( (lastPocketArea !== null) && (lastPocketPosition !== null) )
     {
+        // -------------------------------------------------------------------------------------------------
         // CustomizableUI.addWidgetToArea does not really throw an error but I do see
         // the following error printed in the console:
         // "[CustomizableUI]" "Widget 'pocket-button' not found, unable to move"
         // So, just as a precaution, try-catch is used.
+        // -------------------------------------------------------------------------------------------------
         try
         {
             CustomizableUI.addWidgetToArea( this.POCKET_WIDGET, lastPocketArea, lastPocketPosition );
         }
-        catch( err )
+        catch( errAdd )
         {
         }
 
@@ -272,7 +305,7 @@ NSFatFreeFirefox.enablePocket = function()
 // ---------------------------------------------------------------------------------------------------------
 NSFatFreeFirefox.enableReader = function()
 {
-    Services.prefs.setBoolPref( this.PREF_BUILTIN_READER_ENABLED, true );
+    Services.prefs.clearUserPref( this.PREF_BUILTIN_READER_ENABLED );
 };
 
 
@@ -281,7 +314,7 @@ NSFatFreeFirefox.enableReader = function()
 // ---------------------------------------------------------------------------------------------------------
 NSFatFreeFirefox.enableHello = function()
 {
-    Services.prefs.setBoolPref( this.PREF_BUILTIN_HELLO_ENABLED, true );
+    Services.prefs.clearUserPref( this.PREF_BUILTIN_HELLO_ENABLED );
 };
 
 
@@ -290,7 +323,7 @@ NSFatFreeFirefox.enableHello = function()
 // ---------------------------------------------------------------------------------------------------------
 NSFatFreeFirefox.enableSpecConn = function()
 {
-    Services.prefs.setIntPref( this.PREF_BUILTIN_SPEC_CONN, this.SPEC_CONN_DEF_VAL );
+    Services.prefs.clearUserPref( this.PREF_BUILTIN_SPEC_CONN );
 };
 
 
@@ -304,12 +337,102 @@ NSFatFreeFirefox.disableSpecConn = function()
 
 
 // ---------------------------------------------------------------------------------------------------------
-// Creates and initializes preferences managed by the extension.
+// Enables the 'DNS Prefetch' feature of Firefox
+// ---------------------------------------------------------------------------------------------------------
+NSFatFreeFirefox.enableDNSPrefetch = function()
+{
+   Services.prefs.clearUserPref( this.PREF_BUILTIN_DNS_PREFETCH );
+};
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Enables the 'Link Prefetch' feature of Firefox
+// ---------------------------------------------------------------------------------------------------------
+NSFatFreeFirefox.enableLinkPrefetch = function()
+{
+   Services.prefs.clearUserPref( this.PREF_BUILTIN_LINK_PREFETCH );
+};
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Enables the 'Push Notifications' feature of Firefox
+// ---------------------------------------------------------------------------------------------------------
+NSFatFreeFirefox.enablePushNotifications = function()
+{
+   Services.prefs.clearUserPref( this.PREF_BUILTIN_PUSH_NOTIFICATIONS );
+};
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Enables the 'limit ICE candidates to the default interface only' feature of Firefox
+// ---------------------------------------------------------------------------------------------------------
+NSFatFreeFirefox.enableWebRTCLeak = function()
+{
+   Services.prefs.clearUserPref( this.PREF_BUILTIN_WEB_RTC_LEAK );
+};
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Disables the 'Tracking Protection in non-private windows' feature of Firefox
+// ---------------------------------------------------------------------------------------------------------
+NSFatFreeFirefox.disableTrackingProtection = function()
+{
+   Services.prefs.clearUserPref( this.PREF_BUILTIN_TRACKING_PROTECTION );
+};
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Enables the 'beacon' feature of Firefox
+// ---------------------------------------------------------------------------------------------------------
+NSFatFreeFirefox.enableBeacon = function()
+{
+   Services.prefs.clearUserPref( this.PREF_BUILTIN_BEACON );
+};
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Enables the 'new search behavior in Firefox 43' feature of Firefox
+// ---------------------------------------------------------------------------------------------------------
+NSFatFreeFirefox.enableUnifiedCompl = function()
+{
+   Services.prefs.clearUserPref( this.PREF_BUILTIN_UNIFIED_COMPL );
+};
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Creates and initializes custom preferences managed by the extension.
 // ---------------------------------------------------------------------------------------------------------
 NSFatFreeFirefox.setDefaultPrefs = function()
 {
-    Services.prefs.setBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_POCKET,    false );
-    Services.prefs.setBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN, false );
+    // -----------------------------------------------------------------------------------------------------
+    // Try to 'get' the preference. If it is not present, NS_ERROR_UNEXPECTED would be returned.
+    // Then try to create it and set its default value.
+    // This mechanism takes care of all sorts of upgrade/downgrade scenarios.
+    // -----------------------------------------------------------------------------------------------------
+    try
+    {
+       Services.prefs.getBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_POCKET, false );
+    }
+    catch( errPocket )
+    {
+       if( errPocket.name === 'NS_ERROR_UNEXPECTED' )
+       {
+          Services.prefs.setBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_POCKET,    false );
+       }
+    }
+
+
+    try
+    {
+       Services.prefs.getBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN, false );
+    }
+    catch( errSpecConn )
+    {
+       if( errSpecConn.name === 'NS_ERROR_UNEXPECTED' )
+       {
+          Services.prefs.setBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN, false );
+       }
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // Do not create PREF_FFF_POCKET_AREA and PREF_FFF_POCKET_POSITION preferences. 
