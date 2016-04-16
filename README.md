@@ -1,5 +1,9 @@
-#Fat-Free Firefox Extension
+#Fat-Free Fox Extension
 *Safeguard your private information by disabling privacy-violating features of Firefox and by enabling tracking protection from third-party ads. Keep your browser fat-free by disabling some of its unwanted features.*
+
+**Note 1: The name of this extension has been changed from 'Fat-Free Firefox' to 'Fat-Free Fox'. This was done to conform to Mozilla's add-on naming policies.**
+
+**Note 2: Fat-Free Fox is compatible with the upcoming multi-process Firefox (Electrolysis).**
 
 This extension offers Firefox users more control, protection and awareness about their browsing experience. It tries to strike a balance between strengthening the browser while keeping it usable at the same time.
 
@@ -15,7 +19,7 @@ In addition, users can choose to enable **Tracking Protection** for non-private 
 
 The extension can also be used to disable features that users may find unnecessary or just plain annoying:  
 1. New search behavior in location bar (introduced in Firefox 43)  
-2. Push Notifications by websites (new feature to be introduced soon in Firefox)  
+2. Push Notifications by websites (introduced in Firefox 44)  
 3. Pocket  
 4. Firefox Hello  
 5. Reader View
@@ -26,7 +30,7 @@ You can install the extension by building it from source or by downloading it fr
 ##Usage
 To alter a feature, open *Preferences* (Options) for this extension in the *Firefox Add-ons Manager*. You might need to restart Firefox to make the changes fully effective. This *Preferences* page also contains a clickable button which displays detailed information about each of the supported feature.  
   
-![screenshot](https://addons.cdn.mozilla.net/user-media/previews/full/169/169670.png?modified=1450896694)
+![screenshot](https://addons.cdn.mozilla.net/user-media/previews/full/173/173158.png)
   
 ***  
 
