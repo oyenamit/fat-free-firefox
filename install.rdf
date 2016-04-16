@@ -4,7 +4,7 @@
 <!-- ***** BEGIN LICENSE BLOCK *****
    -
    - Copyright (C) 2015 Namit Bhalla (oyenamit@gmail.com)
-   - This file is part of 'Fat-Free Firefox' extension for the Firefox browser.
+   - This file is part of 'Fat-Free Fox' extension for the Firefox browser.
 
    - This program is free software: you can redistribute it and/or modify
    - it under the terms of the GNU General Public License as published by
@@ -27,9 +27,9 @@
   <Description about="urn:mozilla:install-manifest">
 
       <em:id>fat-free-firefox@oyenamit</em:id>
-      <em:name>Fat-Free Firefox</em:name>
+      <em:name>Fat-Free Fox</em:name>
       <em:description>Safeguard your private information by disabling privacy-violating features of Firefox and by enabling tracking protection from third-party ads. Keep your browser fat-free by disabling some of its unwanted features.</em:description>
-      <em:version>2.0</em:version>
+      <em:version>2.2</em:version>
       <em:creator>oyenamit</em:creator>
       <em:iconURL>chrome://fat-free-firefox/skin/fat-free-firefox-icon.png</em:iconURL>
       <em:icon64URL>chrome://fat-free-firefox/skin/fat-free-firefox-icon64.png</em:icon64URL>
@@ -37,13 +37,14 @@
       <em:bootstrap>true</em:bootstrap>
       <em:optionsType>2</em:optionsType>
       <em:optionsURL>chrome://fat-free-firefox/content/preferences.xul</em:optionsURL>
+      <em:multiprocessCompatible>true</em:multiprocessCompatible>
 
       <!-- Firefox support -->
       <em:targetApplication>
           <Description>
               <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
               <em:minVersion>29.0</em:minVersion>
-              <em:maxVersion>46.0</em:maxVersion>
+              <em:maxVersion>48.0</em:maxVersion>
           </Description>
       </em:targetApplication>
 
@@ -51,7 +52,7 @@
       <em:localized>
           <Description>
               <em:locale>en-US</em:locale>
-              <em:name>Fat-Free Firefox</em:name>
+              <em:name>Fat-Free Fox</em:name>
               <em:description>Safeguard your private information by disabling privacy-violating features of Firefox and by enabling tracking protection from third-party ads. Keep your browser fat-free by disabling some of its unwanted features.</em:description>
               <em:creator>oyenamit</em:creator>
               <em:translator>oyenamit</em:translator>

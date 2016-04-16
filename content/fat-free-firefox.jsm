@@ -1,7 +1,7 @@
 /* ***** BEGIN LICENSE BLOCK *****
  *
  * Copyright (C) 2015 Namit Bhalla (oyenamit@gmail.com)
- * This file is part of 'Fat-Free Firefox' extension for the Firefox browser.
+ * This file is part of 'Fat-Free Fox' extension for the Firefox browser.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,25 +51,27 @@ if( typeof NSFatFreeFirefox === 'undefined' )
 // ---------------------------------------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.PREF_FFF_TREE                      = "extensions.fat-free-firefox.";
-NSFatFreeFirefox.PREF_FFF_DISABLE_POCKET            = "disable-pocket";
-NSFatFreeFirefox.PREF_FFF_POCKET_AREA               = "pocket-area";
-NSFatFreeFirefox.PREF_FFF_POCKET_POSITION           = "pocket-position";
-NSFatFreeFirefox.PREF_FFF_DISABLE_SPEC_CONN         = "disable-speculative-connections";
-NSFatFreeFirefox.PREF_BUILTIN_POCKET_ENABLED        = "browser.pocket.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_READER_ENABLED        = "reader.parse-on-load.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_HELLO_ENABLED         = "loop.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_SPEC_CONN             = "network.http.speculative-parallel-limit";
-NSFatFreeFirefox.PREF_BUILTIN_DNS_PREFETCH          = "network.dns.disablePrefetch";
-NSFatFreeFirefox.PREF_BUILTIN_LINK_PREFETCH         = "network.prefetch-next";
-NSFatFreeFirefox.PREF_BUILTIN_PUSH_NOTIFICATIONS    = "dom.push.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_WEB_RTC_LEAK          = "media.peerconnection.ice.default_address_only";
-NSFatFreeFirefox.PREF_BUILTIN_TRACKING_PROTECTION   = "privacy.trackingprotection.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_BEACON                = "beacon.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_UNIFIED_COMPL         = "browser.urlbar.unifiedcomplete";
-NSFatFreeFirefox.POCKET_WIDGET                      = "pocket-button";
-NSFatFreeFirefox.SPEC_CONN_OFF_VAL                  = 0;
-NSFatFreeFirefox.LOG_MSG_PREFIX                     = "fat-free-firefox 2.0: ";
+NSFatFreeFirefox.PREF_FFF_TREE                              = "extensions.fat-free-firefox.";
+NSFatFreeFirefox.PREF_FFF_DISABLE_POCKET                    = "disable-pocket";
+NSFatFreeFirefox.PREF_FFF_POCKET_AREA                       = "pocket-area";
+NSFatFreeFirefox.PREF_FFF_POCKET_POSITION                   = "pocket-position";
+NSFatFreeFirefox.PREF_FFF_DISABLE_SPEC_CONN                 = "disable-speculative-connections";
+NSFatFreeFirefox.PREF_BUILTIN_POCKET_ENABLED                = "browser.pocket.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON      = "extensions.pocket.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_READER_ENABLED                = "reader.parse-on-load.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_HELLO_ENABLED                 = "loop.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_SPEC_CONN                     = "network.http.speculative-parallel-limit";
+NSFatFreeFirefox.PREF_BUILTIN_DNS_PREFETCH                  = "network.dns.disablePrefetch";
+NSFatFreeFirefox.PREF_BUILTIN_LINK_PREFETCH                 = "network.prefetch-next";
+NSFatFreeFirefox.PREF_BUILTIN_PUSH_NOTIFICATIONS            = "dom.push.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_WEB_RTC_LEAK                  = "media.peerconnection.ice.default_address_only";
+NSFatFreeFirefox.PREF_BUILTIN_TRACKING_PROTECTION           = "privacy.trackingprotection.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_BEACON                        = "beacon.enabled";
+NSFatFreeFirefox.PREF_BUILTIN_UNIFIED_COMPL                 = "browser.urlbar.unifiedcomplete";
+NSFatFreeFirefox.POCKET_WIDGET                              = "pocket-button";
+NSFatFreeFirefox.POCKET_SYS_ADDON_VER                       = "46.0a1";
+NSFatFreeFirefox.SPEC_CONN_OFF_VAL                          = 0;
+NSFatFreeFirefox.LOG_MSG_PREFIX                             = "fat-free-firefox 2.2: ";
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -129,11 +131,13 @@ NSFatFreeFirefox.onStartup = function( data, reason, outer )
     }
 
 
-    if( (reason === outer.ADDON_INSTALL) || (reason === outer.ADDON_UPGRADE) )
+    if( reason === outer.ADDON_INSTALL )
     {
         // -------------------------------------------------------------------------------------------------
         // When a fresh install or upgrade happens, display the documentation page to the user.
         // Don't show it when downgrade happens.
+        //
+        // Since the current version is a minor update, do not show it when upgrade happens.
         // -------------------------------------------------------------------------------------------------
         var aDOMWindow                  = Services.wm.getMostRecentWindow( 'navigator:browser' );
         aDOMWindow.gBrowser.selectedTab = aDOMWindow.gBrowser.addTab( "chrome://fat-free-firefox/locale/doc.html", {relatedToCurrent: true} );
@@ -157,10 +161,10 @@ NSFatFreeFirefox.onShutdown = function( data, reason )
 
         if( (reason === this.outer.ADDON_DISABLE) || (reason === this.outer.ADDON_UNINSTALL) )
         {
-            // ------------------------------------------------------------------------------
+            // ---------------------------------------------------------------------------------------------
             // Extension is about to be disabled/uninstalled.
             // Revert all supported features to their default values.
-            // ------------------------------------------------------------------------------
+            // ---------------------------------------------------------------------------------------------
             this.enablePocket();
             this.enableReader();
             this.enableHello();
@@ -182,27 +186,27 @@ NSFatFreeFirefox.onShutdown = function( data, reason )
 
         if( reason === this.outer.ADDON_DOWNGRADE )
         {
-            // -------------------------------------------------------------------------------------------------
-            // User is downgrading to an older version. We need to remove the preferences added in the current
-            // version and also enable the corresponding features.
-            // -------------------------------------------------------------------------------------------------
+            // ---------------------------------------------------------------------------------------------
+            // User is downgrading to an older version. We need to remove the preferences added in the
+            // current version and also enable the corresponding features.
+            // ---------------------------------------------------------------------------------------------
             if( data.newVersion < 1.0 )
             {
-                // ---------------------------------------------------------------------------------------------
+                // -----------------------------------------------------------------------------------------
                 // Support for Speculative Connections was added in v1.0
                 // If we are being downgraded to a version below that, we need to enable it again.
-                // ---------------------------------------------------------------------------------------------
+                // -----------------------------------------------------------------------------------------
                 this.enableSpecConn();
                 Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN );
             }
 
             if( data.newVersion < 2.0 )
             {
-                // ---------------------------------------------------------------------------------------------
+                // -----------------------------------------------------------------------------------------
                 // Support for these features was added in v2.0
-                // If we are being downgraded to a version below that, we need to reset them to their default
-                // values.
-                // ---------------------------------------------------------------------------------------------
+                // If we are being downgraded to a version below that, we need to reset them to their
+                // default values.
+                // -----------------------------------------------------------------------------------------
                 this.enableDNSPrefetch();
                 this.enableLinkPrefetch();
                 this.enablePushNotifications();
@@ -224,28 +228,62 @@ NSFatFreeFirefox.onShutdown = function( data, reason )
 NSFatFreeFirefox.disablePocket = function()
 {
     // -----------------------------------------------------------------------------------------------------
-    // Disabling the Pocket feature involves 2 steps:
-    // 1. Set the Pocket preference to false
-    // 2. Remove the Pocket widget if it has been added to any toolbar
+    // Disabling Pocket depends on whether it is a system add-on or not.
+    // If it is a system add-on, just setting PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON to false is enough.
+    // Else, we need to set PREF_BUILTIN_POCKET_ENABLED to false and use CustomizableUI to remove the
+    // Pocket button.
     // -----------------------------------------------------------------------------------------------------
 
-    var currentPocketPlacement = null;
 
-    Services.prefs.setBoolPref( this.PREF_BUILTIN_POCKET_ENABLED, false );
-
-    currentPocketPlacement = CustomizableUI.getPlacementOfWidget( this.POCKET_WIDGET );
-    if( currentPocketPlacement !== null )
+    // -----------------------------------------------------------------------------------------------------
+    // Pocket was introduced as a system add-on in version POCKET_SYS_ADDON_VER.
+    // Get the current version of the application and compare.
+    // -----------------------------------------------------------------------------------------------------
+    var appVersion = Services.appinfo.version;
+    var cmp        = Services.vc.compare( appVersion, this.POCKET_SYS_ADDON_VER ); 
+    if( cmp >= 0 )
     {
-        // -------------------------------------------------------------------------------------------------
-        // Persist the location of the widget.
-        // It would be used to restore the widget if Pocket is enabled.
-        // -------------------------------------------------------------------------------------------------
-        Services.prefs.setCharPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA,
-                                    currentPocketPlacement.area );
-        Services.prefs.setIntPref ( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION,
-                                    currentPocketPlacement.position );
+        // Pocket is a system add-on
 
-        CustomizableUI.removeWidgetFromArea( this.POCKET_WIDGET );
+        Services.prefs.setBoolPref( this.PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON, false );
+
+        // -------------------------------------------------------------------------------------------------
+        // After Pocket became a system add-on, the previous pref (PREF_BUILTIN_POCKET_ENABLED) was no
+        // longer used. Also, our prefs to remember location of Pocket widget are also not required anymore.
+        // -------------------------------------------------------------------------------------------------
+        Services.prefs.clearUserPref( this.PREF_BUILTIN_POCKET_ENABLED                   );
+        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
+        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );
+
+    }
+    else
+    {
+        // Pocket is not a system add-on
+
+        // -------------------------------------------------------------------------------------------------
+        // Disabling the Pocket feature involves 2 steps:
+        // 1. Set the Pocket preference to false
+        // 2. Remove the Pocket widget if it has been added to any toolbar
+        // -------------------------------------------------------------------------------------------------
+
+        var currentPocketPlacement = null;
+
+        Services.prefs.setBoolPref( this.PREF_BUILTIN_POCKET_ENABLED, false );
+
+        currentPocketPlacement = CustomizableUI.getPlacementOfWidget( this.POCKET_WIDGET );
+        if( currentPocketPlacement !== null )
+        {
+            // ---------------------------------------------------------------------------------------------
+            // Persist the location of the widget.
+            // It would be used to restore the widget if Pocket is enabled.
+            // ---------------------------------------------------------------------------------------------
+            Services.prefs.setCharPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA,
+                                        currentPocketPlacement.area );
+            Services.prefs.setIntPref ( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION,
+                                        currentPocketPlacement.position );
+
+            CustomizableUI.removeWidgetFromArea( this.POCKET_WIDGET );
+        }
     }
 };
 
@@ -256,46 +294,79 @@ NSFatFreeFirefox.disablePocket = function()
 NSFatFreeFirefox.enablePocket = function()
 {
     // -----------------------------------------------------------------------------------------------------
-    // Enabling the Pocket feature requires 2 steps:
-    // 1. Set the Pocket preference to true
-    // 2. Try to restore the pocket widget to its previous position
+    // Enabling Pocket depends on whether it is a system add-on or not.
+    // If it is a system add-on, just resetting PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON is enough.
+    // Else, we need to reset PREF_BUILTIN_POCKET_ENABLED and use CustomizableUI to restore the
+    // Pocket button.
     // -----------------------------------------------------------------------------------------------------
 
-    var lastPocketArea      = null;
-    var lastPocketPosition  = null;
 
-    Services.prefs.setBoolPref( this.PREF_BUILTIN_POCKET_ENABLED, true );
+    // -----------------------------------------------------------------------------------------------------
+    // Pocket was introduced as a system add-on in version POCKET_SYS_ADDON_VER.
+    // Get the current version of the application and compare.
+    // -----------------------------------------------------------------------------------------------------
+    var appVersion = Services.appinfo.version;
+    var cmp        = Services.vc.compare( appVersion, this.POCKET_SYS_ADDON_VER ); 
+    if( cmp >= 0 )
+    {
+        // Pocket is a system add-on
 
-    try
-    {
-        lastPocketArea      = Services.prefs.getCharPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
-        lastPocketPosition  = Services.prefs.getIntPref ( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );
-    }
-    catch( errLast )
-    {
-        // Trying to get non-existent prefs throws an exception.
-        // Nothing to do here.
-    }
+        Services.prefs.clearUserPref( this.PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON );
 
-    if( (lastPocketArea !== null) && (lastPocketPosition !== null) )
-    {
         // -------------------------------------------------------------------------------------------------
-        // CustomizableUI.addWidgetToArea does not really throw an error but I do see
-        // the following error printed in the console:
-        // "[CustomizableUI]" "Widget 'pocket-button' not found, unable to move"
-        // So, just as a precaution, try-catch is used.
+        // After Pocket became a system add-on, the previous pref (PREF_BUILTIN_POCKET_ENABLED) was no
+        // longer used. Also, our prefs to remember location of Pocket widget are also not required anymore.
         // -------------------------------------------------------------------------------------------------
+        Services.prefs.clearUserPref( this.PREF_BUILTIN_POCKET_ENABLED                   );
+        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
+        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );        
+    }
+    else
+    {
+        // Pocket is not a system add-on
+
+        // -------------------------------------------------------------------------------------------------
+        // Enabling the Pocket feature requires 2 steps:
+        // 1. Set the Pocket preference to true
+        // 2. Try to restore the pocket widget to its previous position
+        // -------------------------------------------------------------------------------------------------
+
+        var lastPocketArea      = null;
+        var lastPocketPosition  = null;
+
+        Services.prefs.setBoolPref( this.PREF_BUILTIN_POCKET_ENABLED, true );
+
         try
         {
-            CustomizableUI.addWidgetToArea( this.POCKET_WIDGET, lastPocketArea, lastPocketPosition );
+            lastPocketArea      = Services.prefs.getCharPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
+            lastPocketPosition  = Services.prefs.getIntPref ( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );
         }
-        catch( errAdd )
+        catch( errLast )
         {
+            // Trying to get non-existent prefs throws an exception.
+            // Nothing to do here.
         }
 
-        // Delete the preferences since they are not required anymore.
-        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
-        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );
+        if( (lastPocketArea !== null) && (lastPocketPosition !== null) )
+        {
+            // ---------------------------------------------------------------------------------------------
+            // CustomizableUI.addWidgetToArea does not really throw an error but I do see
+            // the following error printed in the console:
+            // "[CustomizableUI]" "Widget 'pocket-button' not found, unable to move"
+            // So, just as a precaution, try-catch is used.
+            // ---------------------------------------------------------------------------------------------
+            try
+            {
+                CustomizableUI.addWidgetToArea( this.POCKET_WIDGET, lastPocketArea, lastPocketPosition );
+            }
+            catch( errAdd )
+            {
+            }
+
+            // Delete the preferences since they are not required anymore.
+            Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
+            Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );
+        }
     }
 };
 
@@ -417,7 +488,7 @@ NSFatFreeFirefox.setDefaultPrefs = function()
     {
        if( errPocket.name === 'NS_ERROR_UNEXPECTED' )
        {
-          Services.prefs.setBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_POCKET,    false );
+          Services.prefs.setBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_POCKET, false );
        }
     }
 

@@ -1,7 +1,7 @@
 <!-- ***** BEGIN LICENSE BLOCK *****
    -
    - Copyright (C) 2015 Namit Bhalla (oyenamit@gmail.com)
-   - This file is part of 'Fat-Free Firefox' extension for the Firefox browser.
+   - This file is part of 'Fat-Free Fox' extension for the Firefox browser.
 
    - This program is free software: you can redistribute it and/or modify
    - it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 <!ENTITY fat-free-firefox.prefs.disableHello                "Disable Hello">
 <!ENTITY fat-free-firefox.prefs.disableReader               "Disable Reader View">
 <!ENTITY fat-free-firefox.prefs.disableSpeculativeConn      "Disable speculative network connections when mouse is hovered over a link">
-<!ENTITY fat-free-firefox.prefs.disablePushNotifications    "Block websites from pushing notifications to your screen (new feature coming soon in Firefox)">
+<!ENTITY fat-free-firefox.prefs.disablePushNotifications    "Block websites from pushing notifications to your screen (new feature introduced in Firefox 44)">
 <!ENTITY fat-free-firefox.prefs.disableDNSPrefetch          "Disable proactive DNS lookups">
 <!ENTITY fat-free-firefox.prefs.disableLinkPrefetch         "Disable proactive download of webpage content">
 <!ENTITY fat-free-firefox.prefs.disableWebRTCLeak           "Block private IP address leak due to WebRTC (applicable for Firefox 42 and above)">
