@@ -19,7 +19,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-/*global Components, NSFatFreeFirefox */
+/*global Components, FatFreeFirefox */
 /*jslint this: true, white: true      */
 
 
@@ -49,8 +49,8 @@ function install( data, reason )
     // Nothing needs to be done on installation.
 
     // -------------------------------------------------------------------------
-    // NSFatFreeFirefox is not available here so we cannot call
-    // NSFatFreeFirefox.onInstall().
+    // FatFreeFirefox is not available here so we cannot call
+    // FatFreeFirefox.onInstall().
     // The jsm can be imported only in startup()
     // -------------------------------------------------------------------------
 }
@@ -61,10 +61,10 @@ function install( data, reason )
 // -----------------------------------------------------------------------------
 function startup( data, reason )
 {
-    // This is the earliest where NSFatFreeFirefox is available.
+    // This is the earliest where FatFreeFirefox is available.
     Components.utils.import( "chrome://fat-free-firefox/content/fat-free-firefox.jsm" );
 
-    NSFatFreeFirefox.onStartup( data, reason, this_scope );
+    FatFreeFirefox.onStartup( data, reason, this_scope );
 }
 
 
@@ -73,9 +73,9 @@ function startup( data, reason )
 // -----------------------------------------------------------------------------
 function shutdown( data, reason )
 {
-    NSFatFreeFirefox.onShutdown( data, reason );
+    FatFreeFirefox.onShutdown( data, reason );
 
-    // NSFatFreeFirefox will no longer be available.
+    // FatFreeFirefox will no longer be available.
     Components.utils.unload( "chrome://fat-free-firefox/content/fat-free-firefox.jsm" );
 }
 
@@ -88,7 +88,7 @@ function uninstall( data, reason )
     // Nothing needs to be done on uninstallation.
 
     // -------------------------------------------------------------------------
-    // NSFatFreeFirefox will not be available here since we are unloading the 
+    // FatFreeFirefox will not be available here since we are unloading the 
     // jsm in shutdown()
     // -------------------------------------------------------------------------
 }

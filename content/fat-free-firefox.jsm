@@ -19,8 +19,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-/*global NSFatFreeFirefox, Components, Services, CustomizableUI */
-/*jslint this: true, white: true                                */
+/*global Components, Services, CustomizableUI */
+/*jslint this: true, white: true              */
 
 
 "use strict";
@@ -32,46 +32,42 @@ Components.utils.import( "resource://gre/modules/Services.jsm"    );
 
 // ---------------------------------------------------------------------------------------------------------
 // The module exports only one symbol.
-// It serves as a namespace for all functions and variables.
+// It serves as a namespace for all public functions and variables.
 // ---------------------------------------------------------------------------------------------------------
-this.EXPORTED_SYMBOLS = [ "NSFatFreeFirefox" ];
+this.EXPORTED_SYMBOLS = [ "FatFreeFirefox" ];
 
 
 // ---------------------------------------------------------------------------------------------------------
-// The FatFreeFirefox Namespace. 
-// All functions and 'global' variables reside inside it.
-// Define it if it has not been done before.
+// The FatFreeFirefox namespace. 
+// All public, exported functions and variables reside inside it.
 // ---------------------------------------------------------------------------------------------------------
-if( typeof NSFatFreeFirefox === 'undefined' )
-{
-    var NSFatFreeFirefox = {};
-}
+var FatFreeFirefox = {};
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.PREF_FFF_TREE                              = "extensions.fat-free-firefox.";
-NSFatFreeFirefox.PREF_FFF_DISABLE_POCKET                    = "disable-pocket";
-NSFatFreeFirefox.PREF_FFF_POCKET_AREA                       = "pocket-area";
-NSFatFreeFirefox.PREF_FFF_POCKET_POSITION                   = "pocket-position";
-NSFatFreeFirefox.PREF_FFF_DISABLE_SPEC_CONN                 = "disable-speculative-connections";
-NSFatFreeFirefox.PREF_BUILTIN_POCKET_ENABLED                = "browser.pocket.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON      = "extensions.pocket.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_READER_ENABLED                = "reader.parse-on-load.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_HELLO_ENABLED                 = "loop.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_SPEC_CONN                     = "network.http.speculative-parallel-limit";
-NSFatFreeFirefox.PREF_BUILTIN_DNS_PREFETCH                  = "network.dns.disablePrefetch";
-NSFatFreeFirefox.PREF_BUILTIN_LINK_PREFETCH                 = "network.prefetch-next";
-NSFatFreeFirefox.PREF_BUILTIN_PUSH_NOTIFICATIONS            = "dom.push.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_WEB_RTC_LEAK                  = "media.peerconnection.ice.default_address_only";
-NSFatFreeFirefox.PREF_BUILTIN_TRACKING_PROTECTION           = "privacy.trackingprotection.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_BEACON                        = "beacon.enabled";
-NSFatFreeFirefox.PREF_BUILTIN_UNIFIED_COMPL                 = "browser.urlbar.unifiedcomplete";
-NSFatFreeFirefox.POCKET_WIDGET                              = "pocket-button";
-NSFatFreeFirefox.POCKET_SYS_ADDON_VER                       = "46.0a1";
-NSFatFreeFirefox.SPEC_CONN_OFF_VAL                          = 0;
-NSFatFreeFirefox.LOG_MSG_PREFIX                             = "fat-free-firefox 2.2: ";
+const PREF_FFF_TREE                              = "extensions.fat-free-firefox.";
+const PREF_FFF_DISABLE_POCKET                    = "disable-pocket";
+const PREF_FFF_POCKET_AREA                       = "pocket-area";
+const PREF_FFF_POCKET_POSITION                   = "pocket-position";
+const PREF_FFF_DISABLE_SPEC_CONN                 = "disable-speculative-connections";
+const PREF_BUILTIN_POCKET_ENABLED                = "browser.pocket.enabled";
+const PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON      = "extensions.pocket.enabled";
+const PREF_BUILTIN_READER_ENABLED                = "reader.parse-on-load.enabled";
+const PREF_BUILTIN_HELLO_ENABLED                 = "loop.enabled";
+const PREF_BUILTIN_SPEC_CONN                     = "network.http.speculative-parallel-limit";
+const PREF_BUILTIN_DNS_PREFETCH                  = "network.dns.disablePrefetch";
+const PREF_BUILTIN_LINK_PREFETCH                 = "network.prefetch-next";
+const PREF_BUILTIN_PUSH_NOTIFICATIONS            = "dom.push.enabled";
+const PREF_BUILTIN_WEB_RTC_LEAK                  = "media.peerconnection.ice.default_address_only";
+const PREF_BUILTIN_TRACKING_PROTECTION           = "privacy.trackingprotection.enabled";
+const PREF_BUILTIN_BEACON                        = "beacon.enabled";
+const PREF_BUILTIN_UNIFIED_COMPL                 = "browser.urlbar.unifiedcomplete";
+const POCKET_WIDGET                              = "pocket-button";
+const POCKET_SYS_ADDON_VER                       = "46.0a1";
+const SPEC_CONN_OFF_VAL                          = 0;
+const LOG_MSG_PREFIX                             = "fat-free-firefox 2.2: ";
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -79,7 +75,7 @@ NSFatFreeFirefox.LOG_MSG_PREFIX                             = "fat-free-firefox 
 // We need to hold a reference to nsIPrefBranch because the same is needed to
 // remove the observer later.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.prefBranch                     = null;
+var prefBranch      = null;
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -87,19 +83,19 @@ NSFatFreeFirefox.prefBranch                     = null;
 // This is required because access to outer objects like ADDON_ENABLE etc is
 // not directly available.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.outer                          = null;
+var outer           = null;
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Strings loaded from .properties file.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.stringBundle                   = null;
+var stringBundle    = null;
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Standard entry point for bootstrapped extensions called by the browser.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.onInstall = function( data, reason )
+FatFreeFirefox.onInstall = function( data, reason )
 {
     // Nothing needs to be done on installation.
 };
@@ -108,7 +104,7 @@ NSFatFreeFirefox.onInstall = function( data, reason )
 // ---------------------------------------------------------------------------------------------------------
 // Standard entry point for bootstrapped extensions called by the browser.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.onUninstall = function( data, reason )
+FatFreeFirefox.onUninstall = function( data, reason )
 {
     // Nothing needs to be done on uninstallation.
 };
@@ -117,17 +113,17 @@ NSFatFreeFirefox.onUninstall = function( data, reason )
 // ---------------------------------------------------------------------------------------------------------
 // Standard entry point for bootstrapped extensions called by the browser.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.onStartup = function( data, reason, outer )
+FatFreeFirefox.onStartup = function( data, reason, outer_scope )
 {
-    this.outer = outer;
+    outer = outer_scope;
 
     // We must randomize the URI due to bug# 719376.
-    this.stringBundle = Services.strings.createBundle( "chrome://fat-free-firefox/locale/fat-free-firefox.properties?" + Math.random() );
+    stringBundle = Services.strings.createBundle( "chrome://fat-free-firefox/locale/fat-free-firefox.properties?" + Math.random() );
 
     if( (reason === outer.ADDON_ENABLE )  || (reason === outer.ADDON_INSTALL    ) ||
         (reason === outer.ADDON_UPGRADE)  || (reason === outer.ADDON_DOWNGRADE) )
     {
-        this.setDefaultPrefs();
+        setDefaultPrefs();
     }
 
 
@@ -143,48 +139,48 @@ NSFatFreeFirefox.onStartup = function( data, reason, outer )
         aDOMWindow.gBrowser.selectedTab = aDOMWindow.gBrowser.addTab( "chrome://fat-free-firefox/locale/doc.html", {relatedToCurrent: true} );
     }
 
-    this.prefBranch = Services.prefs.getBranch( this.PREF_FFF_TREE );
-    this.prefBranch.addObserver( this.PREF_FFF_DISABLE_POCKET,    this.prefObserver, false );
-    this.prefBranch.addObserver( this.PREF_FFF_DISABLE_SPEC_CONN, this.prefObserver, false );
+    prefBranch = Services.prefs.getBranch( PREF_FFF_TREE );
+    prefBranch.addObserver( PREF_FFF_DISABLE_POCKET,    prefObserver, false );
+    prefBranch.addObserver( PREF_FFF_DISABLE_SPEC_CONN, prefObserver, false );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Standard entry point for bootstrapped extensions called by the browser.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.onShutdown = function( data, reason )
+FatFreeFirefox.onShutdown = function( data, reason )
 {
-    if( reason !== this.outer.APP_SHUTDOWN )
+    if( reason !== outer.APP_SHUTDOWN )
     {
-        this.prefBranch.removeObserver( this.PREF_FFF_DISABLE_POCKET,    this.prefObserver );
-        this.prefBranch.removeObserver( this.PREF_FFF_DISABLE_SPEC_CONN, this.prefObserver );
+        prefBranch.removeObserver( PREF_FFF_DISABLE_POCKET,    prefObserver );
+        prefBranch.removeObserver( PREF_FFF_DISABLE_SPEC_CONN, prefObserver );
 
-        if( (reason === this.outer.ADDON_DISABLE) || (reason === this.outer.ADDON_UNINSTALL) )
+        if( (reason === outer.ADDON_DISABLE) || (reason === outer.ADDON_UNINSTALL) )
         {
             // ---------------------------------------------------------------------------------------------
             // Extension is about to be disabled/uninstalled.
             // Revert all supported features to their default values.
             // ---------------------------------------------------------------------------------------------
-            this.enablePocket();
-            this.enableReader();
-            this.enableHello();
-            this.enableSpecConn();
-            this.enableDNSPrefetch();
-            this.enableLinkPrefetch();
-            this.enablePushNotifications();
-            this.enableWebRTCLeak();
-            this.disableTrackingProtection();
-            this.enableBeacon();
-            this.enableUnifiedCompl();
+            enablePocket();
+            enableReader();
+            enableHello();
+            enableSpecConn();
+            enableDNSPrefetch();
+            enableLinkPrefetch();
+            enablePushNotifications();
+            enableWebRTCLeak();
+            disableTrackingProtection();
+            enableBeacon();
+            enableUnifiedCompl();
 
-            this.deleteAllPrefs();
+            deleteAllPrefs();
 
             Services.prompt.alert( null, 
-                                   this.stringBundle.GetStringFromName( "fat-free-firefox.extensionName"    ), 
-                                   this.stringBundle.GetStringFromName( "fat-free-firefox.onDisableRestart" ) );
+                                   stringBundle.GetStringFromName( "fat-free-firefox.extensionName"    ), 
+                                   stringBundle.GetStringFromName( "fat-free-firefox.onDisableRestart" ) );
         }
 
-        if( reason === this.outer.ADDON_DOWNGRADE )
+        if( reason === outer.ADDON_DOWNGRADE )
         {
             // ---------------------------------------------------------------------------------------------
             // User is downgrading to an older version. We need to remove the preferences added in the
@@ -196,8 +192,8 @@ NSFatFreeFirefox.onShutdown = function( data, reason )
                 // Support for Speculative Connections was added in v1.0
                 // If we are being downgraded to a version below that, we need to enable it again.
                 // -----------------------------------------------------------------------------------------
-                this.enableSpecConn();
-                Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN );
+                enableSpecConn();
+                Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN );
             }
 
             if( data.newVersion < 2.0 )
@@ -207,17 +203,17 @@ NSFatFreeFirefox.onShutdown = function( data, reason )
                 // If we are being downgraded to a version below that, we need to reset them to their
                 // default values.
                 // -----------------------------------------------------------------------------------------
-                this.enableDNSPrefetch();
-                this.enableLinkPrefetch();
-                this.enablePushNotifications();
-                this.enableWebRTCLeak();
-                this.disableTrackingProtection();
-                this.enableBeacon();
-                this.enableUnifiedCompl();
+                enableDNSPrefetch();
+                enableLinkPrefetch();
+                enablePushNotifications();
+                enableWebRTCLeak();
+                disableTrackingProtection();
+                enableBeacon();
+                enableUnifiedCompl();
             }
         }
 
-        this.outer = null;
+        outer = null;
     }
 };
 
@@ -225,7 +221,7 @@ NSFatFreeFirefox.onShutdown = function( data, reason )
 // ---------------------------------------------------------------------------------------------------------
 // Disables the 'Pocket' feature of Firefox.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.disablePocket = function()
+function disablePocket()
 {
     // -----------------------------------------------------------------------------------------------------
     // Disabling Pocket depends on whether it is a system add-on or not.
@@ -240,20 +236,20 @@ NSFatFreeFirefox.disablePocket = function()
     // Get the current version of the application and compare.
     // -----------------------------------------------------------------------------------------------------
     var appVersion = Services.appinfo.version;
-    var cmp        = Services.vc.compare( appVersion, this.POCKET_SYS_ADDON_VER ); 
+    var cmp        = Services.vc.compare( appVersion, POCKET_SYS_ADDON_VER ); 
     if( cmp >= 0 )
     {
         // Pocket is a system add-on
 
-        Services.prefs.setBoolPref( this.PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON, false );
+        Services.prefs.setBoolPref( PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON, false );
 
         // -------------------------------------------------------------------------------------------------
         // After Pocket became a system add-on, the previous pref (PREF_BUILTIN_POCKET_ENABLED) was no
         // longer used. Also, our prefs to remember location of Pocket widget are also not required anymore.
         // -------------------------------------------------------------------------------------------------
-        Services.prefs.clearUserPref( this.PREF_BUILTIN_POCKET_ENABLED                   );
-        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
-        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );
+        Services.prefs.clearUserPref( PREF_BUILTIN_POCKET_ENABLED              );
+        Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_AREA     );
+        Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION );
 
     }
     else
@@ -268,21 +264,21 @@ NSFatFreeFirefox.disablePocket = function()
 
         var currentPocketPlacement = null;
 
-        Services.prefs.setBoolPref( this.PREF_BUILTIN_POCKET_ENABLED, false );
+        Services.prefs.setBoolPref( PREF_BUILTIN_POCKET_ENABLED, false );
 
-        currentPocketPlacement = CustomizableUI.getPlacementOfWidget( this.POCKET_WIDGET );
+        currentPocketPlacement = CustomizableUI.getPlacementOfWidget( POCKET_WIDGET );
         if( currentPocketPlacement !== null )
         {
             // ---------------------------------------------------------------------------------------------
             // Persist the location of the widget.
             // It would be used to restore the widget if Pocket is enabled.
             // ---------------------------------------------------------------------------------------------
-            Services.prefs.setCharPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA,
+            Services.prefs.setCharPref( PREF_FFF_TREE + PREF_FFF_POCKET_AREA,
                                         currentPocketPlacement.area );
-            Services.prefs.setIntPref ( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION,
+            Services.prefs.setIntPref ( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION,
                                         currentPocketPlacement.position );
 
-            CustomizableUI.removeWidgetFromArea( this.POCKET_WIDGET );
+            CustomizableUI.removeWidgetFromArea( POCKET_WIDGET );
         }
     }
 };
@@ -291,7 +287,7 @@ NSFatFreeFirefox.disablePocket = function()
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'Pocket' feature of Firefox.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enablePocket = function()
+function enablePocket()
 {
     // -----------------------------------------------------------------------------------------------------
     // Enabling Pocket depends on whether it is a system add-on or not.
@@ -306,20 +302,20 @@ NSFatFreeFirefox.enablePocket = function()
     // Get the current version of the application and compare.
     // -----------------------------------------------------------------------------------------------------
     var appVersion = Services.appinfo.version;
-    var cmp        = Services.vc.compare( appVersion, this.POCKET_SYS_ADDON_VER ); 
+    var cmp        = Services.vc.compare( appVersion, POCKET_SYS_ADDON_VER ); 
     if( cmp >= 0 )
     {
         // Pocket is a system add-on
 
-        Services.prefs.clearUserPref( this.PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON );
+        Services.prefs.clearUserPref( PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON );
 
         // -------------------------------------------------------------------------------------------------
         // After Pocket became a system add-on, the previous pref (PREF_BUILTIN_POCKET_ENABLED) was no
         // longer used. Also, our prefs to remember location of Pocket widget are also not required anymore.
         // -------------------------------------------------------------------------------------------------
-        Services.prefs.clearUserPref( this.PREF_BUILTIN_POCKET_ENABLED                   );
-        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
-        Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );        
+        Services.prefs.clearUserPref( PREF_BUILTIN_POCKET_ENABLED              );
+        Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_AREA     );
+        Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION );        
     }
     else
     {
@@ -334,12 +330,12 @@ NSFatFreeFirefox.enablePocket = function()
         var lastPocketArea      = null;
         var lastPocketPosition  = null;
 
-        Services.prefs.setBoolPref( this.PREF_BUILTIN_POCKET_ENABLED, true );
+        Services.prefs.setBoolPref( PREF_BUILTIN_POCKET_ENABLED, true );
 
         try
         {
-            lastPocketArea      = Services.prefs.getCharPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
-            lastPocketPosition  = Services.prefs.getIntPref ( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );
+            lastPocketArea      = Services.prefs.getCharPref( PREF_FFF_TREE + PREF_FFF_POCKET_AREA     );
+            lastPocketPosition  = Services.prefs.getIntPref ( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION );
         }
         catch( errLast )
         {
@@ -357,15 +353,15 @@ NSFatFreeFirefox.enablePocket = function()
             // ---------------------------------------------------------------------------------------------
             try
             {
-                CustomizableUI.addWidgetToArea( this.POCKET_WIDGET, lastPocketArea, lastPocketPosition );
+                CustomizableUI.addWidgetToArea( POCKET_WIDGET, lastPocketArea, lastPocketPosition );
             }
             catch( errAdd )
             {
             }
 
             // Delete the preferences since they are not required anymore.
-            Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA     );
-            Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION );
+            Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_AREA     );
+            Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION );
         }
     }
 };
@@ -374,106 +370,106 @@ NSFatFreeFirefox.enablePocket = function()
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'Reader' feature of Firefox.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enableReader = function()
+function enableReader()
 {
-    Services.prefs.clearUserPref( this.PREF_BUILTIN_READER_ENABLED );
+    Services.prefs.clearUserPref( PREF_BUILTIN_READER_ENABLED );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'Hello' feature of Firefox.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enableHello = function()
+function enableHello()
 {
-    Services.prefs.clearUserPref( this.PREF_BUILTIN_HELLO_ENABLED );
+    Services.prefs.clearUserPref( PREF_BUILTIN_HELLO_ENABLED );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'Speculative Connections' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enableSpecConn = function()
+function enableSpecConn()
 {
-    Services.prefs.clearUserPref( this.PREF_BUILTIN_SPEC_CONN );
+    Services.prefs.clearUserPref( PREF_BUILTIN_SPEC_CONN );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Disables the 'Speculative Connections' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.disableSpecConn = function()
+function disableSpecConn()
 {
-    Services.prefs.setIntPref( this.PREF_BUILTIN_SPEC_CONN, this.SPEC_CONN_OFF_VAL );
+    Services.prefs.setIntPref( PREF_BUILTIN_SPEC_CONN, SPEC_CONN_OFF_VAL );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'DNS Prefetch' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enableDNSPrefetch = function()
+function enableDNSPrefetch()
 {
-   Services.prefs.clearUserPref( this.PREF_BUILTIN_DNS_PREFETCH );
+   Services.prefs.clearUserPref( PREF_BUILTIN_DNS_PREFETCH );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'Link Prefetch' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enableLinkPrefetch = function()
+function enableLinkPrefetch()
 {
-   Services.prefs.clearUserPref( this.PREF_BUILTIN_LINK_PREFETCH );
+   Services.prefs.clearUserPref( PREF_BUILTIN_LINK_PREFETCH );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'Push Notifications' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enablePushNotifications = function()
+function enablePushNotifications()
 {
-   Services.prefs.clearUserPref( this.PREF_BUILTIN_PUSH_NOTIFICATIONS );
+   Services.prefs.clearUserPref( PREF_BUILTIN_PUSH_NOTIFICATIONS );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'limit ICE candidates to the default interface only' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enableWebRTCLeak = function()
+function enableWebRTCLeak()
 {
-   Services.prefs.clearUserPref( this.PREF_BUILTIN_WEB_RTC_LEAK );
+   Services.prefs.clearUserPref( PREF_BUILTIN_WEB_RTC_LEAK );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Disables the 'Tracking Protection in non-private windows' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.disableTrackingProtection = function()
+function disableTrackingProtection()
 {
-   Services.prefs.clearUserPref( this.PREF_BUILTIN_TRACKING_PROTECTION );
+   Services.prefs.clearUserPref( PREF_BUILTIN_TRACKING_PROTECTION );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'beacon' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enableBeacon = function()
+function enableBeacon()
 {
-   Services.prefs.clearUserPref( this.PREF_BUILTIN_BEACON );
+   Services.prefs.clearUserPref( PREF_BUILTIN_BEACON );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Enables the 'new search behavior in Firefox 43' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.enableUnifiedCompl = function()
+function enableUnifiedCompl()
 {
-   Services.prefs.clearUserPref( this.PREF_BUILTIN_UNIFIED_COMPL );
+   Services.prefs.clearUserPref( PREF_BUILTIN_UNIFIED_COMPL );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Creates and initializes custom preferences managed by the extension.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.setDefaultPrefs = function()
+function setDefaultPrefs()
 {
     // -----------------------------------------------------------------------------------------------------
     // Try to 'get' the preference. If it is not present, NS_ERROR_UNEXPECTED would be returned.
@@ -482,26 +478,26 @@ NSFatFreeFirefox.setDefaultPrefs = function()
     // -----------------------------------------------------------------------------------------------------
     try
     {
-       Services.prefs.getBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_POCKET, false );
+       Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET, false );
     }
     catch( errPocket )
     {
        if( errPocket.name === 'NS_ERROR_UNEXPECTED' )
        {
-          Services.prefs.setBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_POCKET, false );
+          Services.prefs.setBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET, false );
        }
     }
 
 
     try
     {
-       Services.prefs.getBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN, false );
+       Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN, false );
     }
     catch( errSpecConn )
     {
        if( errSpecConn.name === 'NS_ERROR_UNEXPECTED' )
        {
-          Services.prefs.setBoolPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN, false );
+          Services.prefs.setBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN, false );
        }
     }
 
@@ -515,48 +511,46 @@ NSFatFreeFirefox.setDefaultPrefs = function()
 // ---------------------------------------------------------------------------------------------------------
 // Deletes all preferences managed by the extension.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.deleteAllPrefs = function()
+function deleteAllPrefs()
 {
-    Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_POCKET    );
-    Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_AREA       );
-    Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_POCKET_POSITION   );
-    Services.prefs.clearUserPref( this.PREF_FFF_TREE + this.PREF_FFF_DISABLE_SPEC_CONN );
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET    );
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_AREA       );
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION   );
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN );
 };
 
 
 // ---------------------------------------------------------------------------------------------------------
 // Observer for changes in preferences.
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.prefObserver = 
+var prefObserver = 
 {
     observe: function( subject, topic, data )
     {
-        // Abbreviation for our namespace for a cleaner code.
-        var nsfff    = NSFatFreeFirefox;
         var newValue = null;
 
-        if( ("nsPref:changed" === topic) && (data === nsfff.PREF_FFF_DISABLE_POCKET) )
+        if( ("nsPref:changed" === topic) && (data === PREF_FFF_DISABLE_POCKET) )
         {
             newValue = subject.getBoolPref( data );
             if( true === newValue )
             {
-                nsfff.disablePocket();
+                disablePocket();
             }
             else
             {
-                nsfff.enablePocket();
+                enablePocket();
             }
         }
-        else if( ("nsPref:changed" === topic) && (data === nsfff.PREF_FFF_DISABLE_SPEC_CONN) )
+        else if( ("nsPref:changed" === topic) && (data === PREF_FFF_DISABLE_SPEC_CONN) )
         {
             newValue = subject.getBoolPref( data );
             if( true === newValue )
             {
-                nsfff.disableSpecConn();
+                disableSpecConn();
             }
             else
             {
-                nsfff.enableSpecConn();
+                enableSpecConn();
             }
         }
         
@@ -567,13 +561,13 @@ NSFatFreeFirefox.prefObserver =
 // ---------------------------------------------------------------------------------------------------------
 // Helper logging function
 // ---------------------------------------------------------------------------------------------------------
-NSFatFreeFirefox.logMsg = function( message )
+function logMsg( message )
 {
     // Use console.log method if it is available
-    if( NSFatFreeFirefox.outer.console && 
-        NSFatFreeFirefox.outer.console.log )
+    if( outer.console && 
+        outer.console.log )
     {
-        NSFatFreeFirefox.outer.console.log( this.LOG_MSG_PREFIX + message );
+        outer.console.log( LOG_MSG_PREFIX + message );
     }
 };
 
