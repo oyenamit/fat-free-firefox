@@ -52,6 +52,7 @@ const PREF_FFF_DISABLE_POCKET                    = "disable-pocket";
 const PREF_FFF_POCKET_AREA                       = "pocket-area";
 const PREF_FFF_POCKET_POSITION                   = "pocket-position";
 const PREF_FFF_DISABLE_SPEC_CONN                 = "disable-speculative-connections";
+const PREF_FFF_DISABLE_UNIFIED_COMPL             = "disable-unifiedcomplete-entries";
 const PREF_BUILTIN_POCKET_ENABLED                = "browser.pocket.enabled";
 const PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON      = "extensions.pocket.enabled";
 const PREF_BUILTIN_READER_ENABLED                = "reader.parse-on-load.enabled";
@@ -67,7 +68,9 @@ const PREF_BUILTIN_UNIFIED_COMPL                 = "browser.urlbar.unifiedcomple
 const POCKET_WIDGET                              = "pocket-button";
 const POCKET_SYS_ADDON_VER                       = "46.0a1";
 const SPEC_CONN_OFF_VAL                          = 0;
-const LOG_MSG_PREFIX                             = "fat-free-firefox 2.2: ";
+const UNIFIED_COMPL_CSS_PATH                     = "chrome://fat-free-firefox/content/unified-compl.css";
+const UNIFIED_COMPL_REMOVE_VER                   = "48.0";
+const LOG_MSG_PREFIX                             = "fat-free-firefox 2.3: ";
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -140,8 +143,19 @@ FatFreeFirefox.onStartup = function( data, reason, outer_scope )
     }
 
     prefBranch = Services.prefs.getBranch( PREF_FFF_TREE );
-    prefBranch.addObserver( PREF_FFF_DISABLE_POCKET,    prefObserver, false );
-    prefBranch.addObserver( PREF_FFF_DISABLE_SPEC_CONN, prefObserver, false );
+    prefBranch.addObserver( PREF_FFF_DISABLE_POCKET,    prefObserver, false     );
+    prefBranch.addObserver( PREF_FFF_DISABLE_SPEC_CONN, prefObserver, false     );
+    prefBranch.addObserver( PREF_FFF_DISABLE_UNIFIED_COMPL, prefObserver, false );
+
+    if( reason === outer.ADDON_UPGRADE )
+    {
+        handleUnifiedComplOnUpgrade( data );
+    }
+
+    if( reason === outer.APP_STARTUP )
+    {
+        handleUnifiedComplOnAppStartup();
+    }
 };
 
 
@@ -152,8 +166,9 @@ FatFreeFirefox.onShutdown = function( data, reason )
 {
     if( reason !== outer.APP_SHUTDOWN )
     {
-        prefBranch.removeObserver( PREF_FFF_DISABLE_POCKET,    prefObserver );
-        prefBranch.removeObserver( PREF_FFF_DISABLE_SPEC_CONN, prefObserver );
+        prefBranch.removeObserver( PREF_FFF_DISABLE_POCKET,        prefObserver );
+        prefBranch.removeObserver( PREF_FFF_DISABLE_SPEC_CONN,     prefObserver );
+        prefBranch.removeObserver( PREF_FFF_DISABLE_UNIFIED_COMPL, prefObserver );
 
         if( (reason === outer.ADDON_DISABLE) || (reason === outer.ADDON_UNINSTALL) )
         {
@@ -211,11 +226,98 @@ FatFreeFirefox.onShutdown = function( data, reason )
                 enableBeacon();
                 enableUnifiedCompl();
             }
+
+            if( data.newVersion < 2.3 )
+            {
+                // -----------------------------------------------------------------------------------------
+                // In v2.3, a new pref PREF_FFF_DISABLE_UNIFIED_COMPL was added. This had to be done
+                // because the built-in pref PREF_BUILTIN_UNIFIED_COMPL was removed in Firefox version given
+                // by UNIFIED_COMPL_REMOVE_VER. 
+                //
+                // If we downgrade to anything below v2.3, we need to cleanup this new pref.
+                // Before that, we need to make sure user selection persists. Value of the new pref needs 
+                // to be copied over to the built-in pref PREF_BUILTIN_UNIFIED_COMPL.
+                //
+                // We must also remove the CSS since that approach was introduced in v2.3.
+                // -----------------------------------------------------------------------------------------
+
+                var currVal = Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL );
+                Services.prefs.setBoolPref( PREF_BUILTIN_UNIFIED_COMPL, !currVal );
+
+                Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL );
+
+                removeCSS( UNIFIED_COMPL_CSS_PATH );
+            }
         }
 
         outer = null;
     }
 };
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Special handling of 'Unified Complete Search Behavior' feature when add-on is upgraded.
+// ---------------------------------------------------------------------------------------------------------
+function handleUnifiedComplOnUpgrade( upgradeData )
+{
+    // -----------------------------------------------------------------------------------------------------
+    // If add-on is being upgraded from 2.2 or below, we need to transfer the value of 
+    // PREF_BUILTIN_UNIFIED_COMPL (if it is present) to the new PREF_FFF_DISABLE_UNIFIED_COMPL pref.
+    // If the value of built-in pref is false, it means that user had selected the option in Preferences.
+    // -----------------------------------------------------------------------------------------------------
+    if( upgradeData.oldVersion < 2.3 )
+    {
+        try
+        {
+            var oldVal = Services.prefs.getBoolPref( PREF_BUILTIN_UNIFIED_COMPL );
+            if( false == oldVal )
+            {
+                // Setting the new pref will trigger the observer and call enableUnifiedCompl().
+                Services.prefs.setBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL, true );
+            }
+            else
+            {
+                // -----------------------------------------------------------------------------------------
+                // Old value was true. User had not selected the option in Preferences.
+                // Nothing to do.
+                // -----------------------------------------------------------------------------------------
+            }
+        }
+        catch( err )
+        {
+            // ---------------------------------------------------------------------------------------------
+            // The built-in pref does not exist or there was an error retriving it.
+            // It means the user had not selected the option in Preferences.
+            // Nothing to do.
+            // ---------------------------------------------------------------------------------------------
+        }
+    }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Special handling of 'Unified Complete Search Behavior' feature at every application startup.
+// ---------------------------------------------------------------------------------------------------------
+function handleUnifiedComplOnAppStartup()
+{
+    // -----------------------------------------------------------------------------------------------------
+    // If the current version of Firefox is UNIFIED_COMPL_REMOVE_VER or greater, suppression of entries is
+    // done by applying CSS and not by setting the built-in pref PREF_BUILTIN_UNIFIED_COMPL.
+    // The CSS needs to be applied at every application startup if user has selected the option in 
+    // Preferences.
+    // -----------------------------------------------------------------------------------------------------
+
+    var unifiedComplDisabled = Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL );
+    if( unifiedComplDisabled )
+    {
+        var appVersion = Services.appinfo.version;
+        var cmp = Services.vc.compare( appVersion, UNIFIED_COMPL_REMOVE_VER );
+        if( cmp >= 0 )
+        {
+            applyCSS( UNIFIED_COMPL_CSS_PATH );
+        }
+    }
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -458,11 +560,56 @@ function enableBeacon()
 
 
 // ---------------------------------------------------------------------------------------------------------
-// Enables the 'new search behavior in Firefox 43' feature of Firefox
+// Disables the 'Unified Complete Search Behavior' feature of Firefox
+// ---------------------------------------------------------------------------------------------------------
+function disableUnifiedCompl()
+{
+    // -----------------------------------------------------------------------------------------------------
+    // In Firefox version given by UNIFIED_COMPL_REMOVE_VER, the built-in pref PREF_BUILTIN_UNIFIED_COMPL
+    // was removed.
+    //
+    // So, disabling the feature has to be done in one of two ways, depending on the version of Firefox.
+    // If Firefox version is UNIFIED_COMPL_REMOVE_VER or greater, then CSS needs to be applied.
+    // Else, the built-in pref PREF_BUILTIN_UNIFIED_COMPL needs to be set.
+    // -----------------------------------------------------------------------------------------------------
+
+    var appVersion = Services.appinfo.version;
+    var cmp = Services.vc.compare( appVersion, UNIFIED_COMPL_REMOVE_VER );
+    if( cmp >= 0 )
+    {
+        applyCSS( UNIFIED_COMPL_CSS_PATH );
+    }
+    else
+    {
+        Services.prefs.setBoolPref( PREF_BUILTIN_UNIFIED_COMPL, false );
+    }
+};
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Enables the 'Unified Complete Search Behavior' feature of Firefox
 // ---------------------------------------------------------------------------------------------------------
 function enableUnifiedCompl()
 {
-   Services.prefs.clearUserPref( PREF_BUILTIN_UNIFIED_COMPL );
+    // -----------------------------------------------------------------------------------------------------
+    // In Firefox version given by UNIFIED_COMPL_REMOVE_VER, the built-in pref PREF_BUILTIN_UNIFIED_COMPL
+    // was removed.
+    //
+    // So, enabling the feature has to be done in one of two ways, depending on the version of Firefox.
+    // If Firefox version is UNIFIED_COMPL_REMOVE_VER or greater, then CSS needs to be removed.
+    // Else, the built-in pref PREF_BUILTIN_UNIFIED_COMPL needs to be reset. We are resetting the built-in
+    // pref always so that it gets cleaned up if not in use and does not remain dangling due to any 
+    // upgrade/downgrade scenarios.
+    // -----------------------------------------------------------------------------------------------------
+
+    var appVersion = Services.appinfo.version;
+    var cmp = Services.vc.compare( appVersion, UNIFIED_COMPL_REMOVE_VER );
+    if( cmp >= 0 )
+    {
+        removeCSS( UNIFIED_COMPL_CSS_PATH );
+    }
+
+    Services.prefs.clearUserPref( PREF_BUILTIN_UNIFIED_COMPL );
 };
 
 
@@ -478,28 +625,41 @@ function setDefaultPrefs()
     // -----------------------------------------------------------------------------------------------------
     try
     {
-       Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET, false );
+        Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET, false );
     }
     catch( errPocket )
     {
-       if( errPocket.name === 'NS_ERROR_UNEXPECTED' )
-       {
-          Services.prefs.setBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET, false );
-       }
+        if( errPocket.name === 'NS_ERROR_UNEXPECTED' )
+        {
+            Services.prefs.setBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET, false );
+        }
     }
-
 
     try
     {
-       Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN, false );
+        Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN, false );
     }
     catch( errSpecConn )
     {
-       if( errSpecConn.name === 'NS_ERROR_UNEXPECTED' )
-       {
-          Services.prefs.setBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN, false );
-       }
+
+        if( errSpecConn.name === 'NS_ERROR_UNEXPECTED' )
+        {
+            Services.prefs.setBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN, false );
+        }
     }
+
+    try
+    {
+        Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL, false );
+    }
+    catch( errUnifiedCompl )
+    {
+        if( errUnifiedCompl.name === 'NS_ERROR_UNEXPECTED' )
+        {
+            Services.prefs.setBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL, false );
+        }
+    }
+    
 
     // -----------------------------------------------------------------------------------------------------
     // Do not create PREF_FFF_POCKET_AREA and PREF_FFF_POCKET_POSITION preferences. 
@@ -513,10 +673,11 @@ function setDefaultPrefs()
 // ---------------------------------------------------------------------------------------------------------
 function deleteAllPrefs()
 {
-    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET    );
-    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_AREA       );
-    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION   );
-    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN );
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET        );
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_AREA           );
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION       );
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN     );
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL );
 };
 
 
@@ -553,9 +714,58 @@ var prefObserver =
                 enableSpecConn();
             }
         }
-        
+        else if( ("nsPref:changed" === topic) && (data === PREF_FFF_DISABLE_UNIFIED_COMPL) )
+        {
+            newValue = subject.getBoolPref( data );
+            if( true === newValue )
+            {
+                disableUnifiedCompl();
+            }
+            else
+            {
+                enableUnifiedCompl();
+            }
+        }
     }
 };
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Applies the CSS given by 'path' (if not already applied) 
+// ---------------------------------------------------------------------------------------------------------
+function applyCSS( path )
+{
+    var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
+                        .getService( Components.interfaces.nsIStyleSheetService );
+    var ios = Components.classes["@mozilla.org/network/io-service;1"]
+                        .getService( Components.interfaces.nsIIOService );
+
+    var uri = ios.newURI( path, null, null );
+
+    if( !sss.sheetRegistered( uri, sss.USER_SHEET ) )
+    {
+        sss.loadAndRegisterSheet( uri, sss.USER_SHEET );
+    }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Removes the CSS given by 'path' (if it was previously applied) 
+// ---------------------------------------------------------------------------------------------------------
+function removeCSS( path )
+{
+    var sss = Components.classes["@mozilla.org/content/style-sheet-service;1"]
+                        .getService( Components.interfaces.nsIStyleSheetService );
+    var ios = Components.classes["@mozilla.org/network/io-service;1"]
+                        .getService( Components.interfaces.nsIIOService );
+
+    var uri = ios.newURI( path, null, null );
+
+    if( sss.sheetRegistered( uri, sss.USER_SHEET ) )
+    {
+        sss.unregisterSheet( uri, sss.USER_SHEET );
+    }
+}
 
 
 // ---------------------------------------------------------------------------------------------------------

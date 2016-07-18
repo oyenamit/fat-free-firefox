@@ -30,6 +30,7 @@ var reasons  = ["", "APP_STARTUP", "APP_SHUTDOWN", "ADDON_ENABLE", "ADDON_DISABL
 
 
 var this_scope = {
+                    APP_STARTUP:      APP_STARTUP,
                     ADDON_ENABLE:     ADDON_ENABLE, 
                     ADDON_INSTALL:    ADDON_INSTALL, 
                     ADDON_UPGRADE:    ADDON_UPGRADE, 

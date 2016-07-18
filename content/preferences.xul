@@ -34,11 +34,10 @@
                      oncommand="Components.utils.import('resource://gre/modules/Services.jsm'); Services.wm.getMostRecentWindow('navigator:browser').gBrowser.selectedTab = Services.wm.getMostRecentWindow('navigator:browser').gBrowser.addTab('chrome://fat-free-firefox/locale/doc.html', {relatedToCurrent: true});"/>
     </setting>
 
-    <setting pref="browser.urlbar.unifiedcomplete"
+    <setting pref="extensions.fat-free-firefox.disable-unifiedcomplete-entries"
              type="bool"
-             inverted="true"
              title="&fat-free-firefox.prefs.disableUnifiedComplete;"
-             desc="&fat-free-firefox.prefs.unifiedCompleteDesc;"/>
+             desc="&fat-free-firefox.prefs.requiresNoRestart;"/>
 
     <setting pref="dom.push.enabled"
              type="bool"
