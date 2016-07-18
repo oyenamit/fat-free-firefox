@@ -18,7 +18,7 @@ The extension provides an easy, single-click way to disable the following featur
 In addition, users can choose to enable **Tracking Protection** for non-private browsing windows to prevent online advertising companies from secretly gathering their private data like location, gender, age, political leanings, medical conditions, areas of interest etc. Please note that when *Tracking Protection* is enabled, some web pages may appear broken since ads that track behavior are blocked. Users can disable tracking protection on a per-site basis using the [Control Center](https://support.mozilla.org/en-US/kb/control-center-site-privacy-and-security-firefox) built into Firefox.
 
 The extension can also be used to disable features that users may find unnecessary or just plain annoying:  
-1. New search behavior in location bar (introduced in Firefox 43)  
+1. The "Visit example.com" and "Search with Google" entries in location bar (introduced in Firefox 43)  
 2. Push Notifications by websites (introduced in Firefox 44)  
 3. Pocket  
 4. Firefox Hello  
@@ -30,7 +30,7 @@ You can install the extension by building it from source or by downloading it fr
 ##Usage
 To alter a feature, open *Preferences* (Options) for this extension in the *Firefox Add-ons Manager*. You might need to restart Firefox to make the changes fully effective. This *Preferences* page also contains a clickable button which displays detailed information about each of the supported feature.  
   
-![screenshot](https://addons.cdn.mozilla.net/user-media/previews/full/173/173158.png)
+![screenshot](https://addons.cdn.mozilla.net/user-media/previews/full/176/176208.png?modified=1468859698)
   
 ***  
 
