@@ -1,4 +1,4 @@
-#Fat-Free Fox Extension
+# Fat-Free Fox Extension
 *Safeguard your private information by disabling privacy-violating features of Firefox and by enabling tracking protection from third-party ads. Keep your browser fat-free by disabling some of its unwanted features.*
 
 **Note 1: The name of this extension has been changed from 'Fat-Free Firefox' to 'Fat-Free Fox'. This was done to conform to Mozilla's add-on naming policies.**
@@ -24,10 +24,10 @@ The extension can also be used to disable features that users may find unnecessa
 4. Firefox Hello  
 5. Reader View
 
-##Installation
+## Installation
 You can install the extension by building it from source or by downloading it from the [Mozilla Add-ons](https://addons.mozilla.org/en-US/firefox/addon/fat-free-firefox/) site.
 
-##Usage
+## Usage
 To alter a feature, open *Preferences* (Options) for this extension in the *Firefox Add-ons Manager*. You might need to restart Firefox to make the changes fully effective. This *Preferences* page also contains a clickable button which displays detailed information about each of the supported feature.  
   
 ![screenshot](https://addons.cdn.mozilla.net/user-media/previews/full/176/176208.png?modified=1468859698)
