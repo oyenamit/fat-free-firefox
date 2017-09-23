@@ -40,3 +40,7 @@
 <!ENTITY fat-free-firefox.prefs.docTitle                    "Read more about the supported features">
 <!ENTITY fat-free-firefox.prefs.docDesc                     "(privacy implications and other possible reasons to disable them)">
 
+<!-- Dropdown options for WebRTC -->
+<!ENTITY fat-free-firefox.prefs.webRTCEnabled               "Do not block">
+<!ENTITY fat-free-firefox.prefs.webRTCCompatible            "Compatible mode: Block private IP address leak (websites should not be affected)">
+<!ENTITY fat-free-firefox.prefs.webRTCDisabled              "Full mode: Disable WebRTC completely (might cause some websites from loading properly)">

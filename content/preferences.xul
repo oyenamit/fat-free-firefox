@@ -50,10 +50,18 @@
              title="&fat-free-firefox.prefs.enableTrackingProtection;"
              desc="&fat-free-firefox.prefs.trackingProtectionDesc;"/>
 
-    <setting pref="media.peerconnection.ice.default_address_only"
-             type="bool"
+    <setting pref="extensions.fat-free-firefox.disable-webRTC"
+             type="menulist"
              title="&fat-free-firefox.prefs.disableWebRTCLeak;"
-             desc="&fat-free-firefox.prefs.requiresNoRestartReload;"/>
+             desc="&fat-free-firefox.prefs.requiresNoRestartReload;">
+             <menulist>
+                 <menupopup>
+                     <menuitem value="0" label="&fat-free-firefox.prefs.webRTCEnabled;"/>
+                     <menuitem value="1" label="&fat-free-firefox.prefs.webRTCCompatible;"/>
+                     <menuitem value="2" label="&fat-free-firefox.prefs.webRTCDisabled;"/>
+                 </menupopup>
+             </menulist>
+    </setting>
 
     <setting pref="beacon.enabled"
              type="bool"

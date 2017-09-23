@@ -19,8 +19,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-/*global Components, Services, CustomizableUI */
-/*jslint this: true, white: true              */
+/*global Components, Services, CustomizableUI          */
+/*jshint globalstrict: true, esversion: 6, white: true */
 
 
 "use strict";
@@ -53,6 +53,7 @@ const PREF_FFF_POCKET_AREA                       = "pocket-area";
 const PREF_FFF_POCKET_POSITION                   = "pocket-position";
 const PREF_FFF_DISABLE_SPEC_CONN                 = "disable-speculative-connections";
 const PREF_FFF_DISABLE_UNIFIED_COMPL             = "disable-unifiedcomplete-entries";
+const PREF_FFF_DISABLE_WEB_RTC_LEAK              = "disable-webRTC";
 const PREF_BUILTIN_POCKET_ENABLED                = "browser.pocket.enabled";
 const PREF_BUILTIN_POCKET_ENABLED_SYS_ADDON      = "extensions.pocket.enabled";
 const PREF_BUILTIN_READER_ENABLED                = "reader.parse-on-load.enabled";
@@ -61,16 +62,21 @@ const PREF_BUILTIN_SPEC_CONN                     = "network.http.speculative-par
 const PREF_BUILTIN_DNS_PREFETCH                  = "network.dns.disablePrefetch";
 const PREF_BUILTIN_LINK_PREFETCH                 = "network.prefetch-next";
 const PREF_BUILTIN_PUSH_NOTIFICATIONS            = "dom.push.enabled";
-const PREF_BUILTIN_WEB_RTC_LEAK                  = "media.peerconnection.ice.default_address_only";
+const PREF_BUILTIN_WEB_RTC_DEFAULT_ADDR_ONLY     = "media.peerconnection.ice.default_address_only";
+const PREF_BUILTIN_WEB_RTC_NO_HOST               = "media.peerconnection.ice.no_host";
+const PREF_BUILTIN_WEB_RTC_ENABLED               = "media.peerconnection.enabled";
 const PREF_BUILTIN_TRACKING_PROTECTION           = "privacy.trackingprotection.enabled";
 const PREF_BUILTIN_BEACON                        = "beacon.enabled";
 const PREF_BUILTIN_UNIFIED_COMPL                 = "browser.urlbar.unifiedcomplete";
 const POCKET_WIDGET                              = "pocket-button";
 const POCKET_SYS_ADDON_VER                       = "46.0a1";
 const SPEC_CONN_OFF_VAL                          = 0;
+const WEB_RTC_VAL_ENABLE_LEAK                    = 0;
+const WEB_RTC_VAL_COMPATIBLE                     = 1;
+const WEB_RTC_VAL_DISABLE                        = 2;
 const UNIFIED_COMPL_CSS_PATH                     = "chrome://fat-free-firefox/content/unified-compl.css";
 const UNIFIED_COMPL_REMOVE_VER                   = "48.0";
-const LOG_MSG_PREFIX                             = "fat-free-firefox 2.3: ";
+const LOG_MSG_PREFIX                             = "fat-free-firefox 3.0: ";
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -130,13 +136,11 @@ FatFreeFirefox.onStartup = function( data, reason, outer_scope )
     }
 
 
-    if( reason === outer.ADDON_INSTALL )
+    if( (reason === outer.ADDON_INSTALL ) || (reason === outer.ADDON_UPGRADE) )
     {
         // -------------------------------------------------------------------------------------------------
         // When a fresh install or upgrade happens, display the documentation page to the user.
         // Don't show it when downgrade happens.
-        //
-        // Since the current version is a minor update, do not show it when upgrade happens.
         // -------------------------------------------------------------------------------------------------
         var aDOMWindow                  = Services.wm.getMostRecentWindow( 'navigator:browser' );
         aDOMWindow.gBrowser.selectedTab = aDOMWindow.gBrowser.addTab( "chrome://fat-free-firefox/locale/doc.html", {relatedToCurrent: true} );
@@ -146,10 +150,12 @@ FatFreeFirefox.onStartup = function( data, reason, outer_scope )
     prefBranch.addObserver( PREF_FFF_DISABLE_POCKET,    prefObserver, false     );
     prefBranch.addObserver( PREF_FFF_DISABLE_SPEC_CONN, prefObserver, false     );
     prefBranch.addObserver( PREF_FFF_DISABLE_UNIFIED_COMPL, prefObserver, false );
+    prefBranch.addObserver( PREF_FFF_DISABLE_WEB_RTC_LEAK, prefObserver, false  );
 
     if( reason === outer.ADDON_UPGRADE )
     {
         handleUnifiedComplOnUpgrade( data );
+        handleWebRTCOnUpgrade( data );
     }
 
     if( reason === outer.APP_STARTUP )
@@ -169,6 +175,7 @@ FatFreeFirefox.onShutdown = function( data, reason )
         prefBranch.removeObserver( PREF_FFF_DISABLE_POCKET,        prefObserver );
         prefBranch.removeObserver( PREF_FFF_DISABLE_SPEC_CONN,     prefObserver );
         prefBranch.removeObserver( PREF_FFF_DISABLE_UNIFIED_COMPL, prefObserver );
+        prefBranch.removeObserver( PREF_FFF_DISABLE_WEB_RTC_LEAK,  prefObserver );
 
         if( (reason === outer.ADDON_DISABLE) || (reason === outer.ADDON_UNINSTALL) )
         {
@@ -248,6 +255,20 @@ FatFreeFirefox.onShutdown = function( data, reason )
 
                 removeCSS( UNIFIED_COMPL_CSS_PATH );
             }
+
+            if( data.newVersion < 3.0 )
+            {
+                // -----------------------------------------------------------------------------------------
+                // In v3.0, a new pref PREF_FFF_DISABLE_WEB_RTC_LEAK was added. This was done because the 
+                // previous handling of WebRTC leak was broken.
+                //
+                // If we downgrade to anything below v3.0, we need to cleanup this new pref.
+                // We also need to revert built-in WebRTC related settings to their default values.
+                // -----------------------------------------------------------------------------------------
+                
+                Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_WEB_RTC_LEAK  );
+                enableWebRTCLeak();
+            }
         }
 
         outer = null;
@@ -321,6 +342,23 @@ function handleUnifiedComplOnAppStartup()
 
 
 // ---------------------------------------------------------------------------------------------------------
+// Special handling of 'WebRTC Leak' feature when add-on is upgraded.
+// ---------------------------------------------------------------------------------------------------------
+function handleWebRTCOnUpgrade( upgradeData )
+{
+    // -----------------------------------------------------------------------------------------------------
+    // In v3.0, WebRTC private address leak was handled in a new way.
+    // So, if the add-on has been upgraded from 2.3 or below, we need to reset 
+    // PREF_BUILTIN_WEB_RTC_DEFAULT_ADDR_ONLY because this was used in the old implementation.
+    // -----------------------------------------------------------------------------------------------------
+    if( upgradeData.oldVersion < 3.0 )
+    {
+        Services.prefs.clearUserPref( PREF_BUILTIN_WEB_RTC_DEFAULT_ADDR_ONLY );
+    }
+}
+
+
+// ---------------------------------------------------------------------------------------------------------
 // Disables the 'Pocket' feature of Firefox.
 // ---------------------------------------------------------------------------------------------------------
 function disablePocket()
@@ -383,7 +421,7 @@ function disablePocket()
             CustomizableUI.removeWidgetFromArea( POCKET_WIDGET );
         }
     }
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -466,7 +504,7 @@ function enablePocket()
             Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION );
         }
     }
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -475,7 +513,7 @@ function enablePocket()
 function enableReader()
 {
     Services.prefs.clearUserPref( PREF_BUILTIN_READER_ENABLED );
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -484,7 +522,7 @@ function enableReader()
 function enableHello()
 {
     Services.prefs.clearUserPref( PREF_BUILTIN_HELLO_ENABLED );
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -493,7 +531,7 @@ function enableHello()
 function enableSpecConn()
 {
     Services.prefs.clearUserPref( PREF_BUILTIN_SPEC_CONN );
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -502,7 +540,7 @@ function enableSpecConn()
 function disableSpecConn()
 {
     Services.prefs.setIntPref( PREF_BUILTIN_SPEC_CONN, SPEC_CONN_OFF_VAL );
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -510,8 +548,8 @@ function disableSpecConn()
 // ---------------------------------------------------------------------------------------------------------
 function enableDNSPrefetch()
 {
-   Services.prefs.clearUserPref( PREF_BUILTIN_DNS_PREFETCH );
-};
+    Services.prefs.clearUserPref( PREF_BUILTIN_DNS_PREFETCH );
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -519,8 +557,8 @@ function enableDNSPrefetch()
 // ---------------------------------------------------------------------------------------------------------
 function enableLinkPrefetch()
 {
-   Services.prefs.clearUserPref( PREF_BUILTIN_LINK_PREFETCH );
-};
+    Services.prefs.clearUserPref( PREF_BUILTIN_LINK_PREFETCH );
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -528,17 +566,43 @@ function enableLinkPrefetch()
 // ---------------------------------------------------------------------------------------------------------
 function enablePushNotifications()
 {
-   Services.prefs.clearUserPref( PREF_BUILTIN_PUSH_NOTIFICATIONS );
-};
+    Services.prefs.clearUserPref( PREF_BUILTIN_PUSH_NOTIFICATIONS );
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
-// Enables the 'limit ICE candidates to the default interface only' feature of Firefox
+// Reverts WebRTC related settings to their default values.
 // ---------------------------------------------------------------------------------------------------------
 function enableWebRTCLeak()
 {
-   Services.prefs.clearUserPref( PREF_BUILTIN_WEB_RTC_LEAK );
-};
+    Services.prefs.clearUserPref( PREF_BUILTIN_WEB_RTC_DEFAULT_ADDR_ONLY );
+    Services.prefs.clearUserPref( PREF_BUILTIN_WEB_RTC_NO_HOST           );
+    Services.prefs.clearUserPref( PREF_BUILTIN_WEB_RTC_ENABLED           );
+}
+
+
+// ---------------------------------------------------------------------------------------------------------
+// Processes user selection from options UI for WebRTC.
+// ---------------------------------------------------------------------------------------------------------
+function onWebRTCPrefChanged( newValue )
+{
+    if( newValue === WEB_RTC_VAL_ENABLE_LEAK )
+    {
+        enableWebRTCLeak();
+    }
+    else if( newValue === WEB_RTC_VAL_COMPATIBLE )
+    {
+        Services.prefs.setBoolPref( PREF_BUILTIN_WEB_RTC_DEFAULT_ADDR_ONLY, true );
+        Services.prefs.setBoolPref( PREF_BUILTIN_WEB_RTC_NO_HOST, true           );
+        Services.prefs.clearUserPref( PREF_BUILTIN_WEB_RTC_ENABLED               );
+    }
+    else if( newValue === WEB_RTC_VAL_DISABLE )
+    {
+        Services.prefs.clearUserPref( PREF_BUILTIN_WEB_RTC_DEFAULT_ADDR_ONLY );
+        Services.prefs.clearUserPref( PREF_BUILTIN_WEB_RTC_NO_HOST           );
+        Services.prefs.setBoolPref( PREF_BUILTIN_WEB_RTC_ENABLED, false      );
+    }
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -547,7 +611,7 @@ function enableWebRTCLeak()
 function disableTrackingProtection()
 {
    Services.prefs.clearUserPref( PREF_BUILTIN_TRACKING_PROTECTION );
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -556,7 +620,7 @@ function disableTrackingProtection()
 function enableBeacon()
 {
    Services.prefs.clearUserPref( PREF_BUILTIN_BEACON );
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -583,7 +647,7 @@ function disableUnifiedCompl()
     {
         Services.prefs.setBoolPref( PREF_BUILTIN_UNIFIED_COMPL, false );
     }
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -610,7 +674,7 @@ function enableUnifiedCompl()
     }
 
     Services.prefs.clearUserPref( PREF_BUILTIN_UNIFIED_COMPL );
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -623,9 +687,10 @@ function setDefaultPrefs()
     // Then try to create it and set its default value.
     // This mechanism takes care of all sorts of upgrade/downgrade scenarios.
     // -----------------------------------------------------------------------------------------------------
+
     try
     {
-        Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET, false );
+        Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_POCKET );
     }
     catch( errPocket )
     {
@@ -637,7 +702,7 @@ function setDefaultPrefs()
 
     try
     {
-        Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN, false );
+        Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN );
     }
     catch( errSpecConn )
     {
@@ -650,7 +715,7 @@ function setDefaultPrefs()
 
     try
     {
-        Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL, false );
+        Services.prefs.getBoolPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL );
     }
     catch( errUnifiedCompl )
     {
@@ -660,12 +725,23 @@ function setDefaultPrefs()
         }
     }
     
+    try
+    {
+        Services.prefs.getIntPref( PREF_FFF_TREE + PREF_FFF_DISABLE_WEB_RTC_LEAK );
+    }
+    catch( errWebRTCLeak )
+    {
+        if( errWebRTCLeak.name === 'NS_ERROR_UNEXPECTED' )
+        {
+            Services.prefs.setIntPref( PREF_FFF_TREE + PREF_FFF_DISABLE_WEB_RTC_LEAK, WEB_RTC_VAL_ENABLE_LEAK );
+        }
+    }
 
     // -----------------------------------------------------------------------------------------------------
     // Do not create PREF_FFF_POCKET_AREA and PREF_FFF_POCKET_POSITION preferences. 
     // They will be created just-in-time when required.
     // -----------------------------------------------------------------------------------------------------
-};
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -678,7 +754,8 @@ function deleteAllPrefs()
     Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_POCKET_POSITION       );
     Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_SPEC_CONN     );
     Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_UNIFIED_COMPL );
-};
+    Services.prefs.clearUserPref( PREF_FFF_TREE + PREF_FFF_DISABLE_WEB_RTC_LEAK  );
+}
 
 
 // ---------------------------------------------------------------------------------------------------------
@@ -725,6 +802,11 @@ var prefObserver =
             {
                 enableUnifiedCompl();
             }
+        }
+        else if( ("nsPref:changed" === topic) && (data === PREF_FFF_DISABLE_WEB_RTC_LEAK) )
+        {
+            newValue = subject.getIntPref( data );
+            onWebRTCPrefChanged( newValue );
         }
     }
 };
@@ -779,5 +861,5 @@ function logMsg( message )
     {
         outer.console.log( LOG_MSG_PREFIX + message );
     }
-};
+}
 

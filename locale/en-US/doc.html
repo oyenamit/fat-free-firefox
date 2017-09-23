@@ -38,15 +38,32 @@
                 background-color: white;
                 color: MidnightBlue;
             }
+            h3 {
+                margin-bottom: 0.3em;
+                margin-top: 0.3em;
+                background-color: white;
+                color: MidnightBlue;
+            }
             h4 {
                 margin-bottom: 0.3em;
+            }
+            table {
+                border: 1px solid lightgray;
+            }
+            td {
+                padding: 10px;
+                vertical-align: center;
             }
         </style>
     </head>
     <body>
         <div style="width:1000px; margin:0 auto;">
             <div style="text-align:center"><h1><img src="chrome://fat-free-firefox/skin/fat-free-firefox-icon64.png" alt="" style="vertical-align:middle;margin:0px 20px" ><u>Fat-Free Fox</u></h1></div>
-            <div style="text-align:center"><i>You are viewing this page either because it was opened from add-on preferences or because this add-on has just been installed/upgraded. This page explains some of the probable reasons for altering Firefox features. The objective is to inform and educate the users and not to spread mistrust or panic. <u>This is Fat-Free Fox version 2.3</u></i><br><br></div>
+            <div style="text-align:center"><i>You are viewing this page either because it was opened from add-on preferences or because this add-on has just been installed/upgraded. This page explains some of the probable reasons for altering Firefox features. The objective is to inform and educate the users and not to spread mistrust or panic. <u>This is Fat-Free Fox version 3.0</u></i><br><br><br><br></div>
+            <table><tr><td>
+                <h3>About This Version</h3>
+                        In Firefox 51, Mozilla <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1297416">changed their implementation</a> of WebRTC protocol that caused compatibility problems with Fat-Free Fox. Specifically, it broke the "Block WebRTC Private IP Address Leak" feature of the add-on. This version fixes this compatibility problem and introduces new options to prevent WebRTC private IP address leak. Many thanks to Firefox user <a href="https://addons.mozilla.org/en-US/firefox/user/ApprenticeDuck/">Andreas</a> for reporting this issue.
+                </td></tr> </table>
             <h2>Search Behavior in Location Bar</h2><hr>
             In Firefox 43, the location bar was enhanced with extra search related capabilities. When users type something in the location bar, related search suggestions are provided at the end of the dropdown list.  Also, Firefox adds a <i>"Visit www.example.com"</i> or <i>"Search with Google" </i> entry at the top of the dropdown list. Users may find these new <i>features</i> annoying and distracting and might want to disable them completely.
             <h2>Push Notifications by Websites</h2><hr>
@@ -64,11 +81,15 @@
             <br><br>
             <b>CAUTION</b>: With tracking protection enabled, some web pages may appear broken since ads that track behavior are blocked. Users can disable tracking protection on a per-site basis using the <a href="https://support.mozilla.org/en-US/kb/control-center-site-privacy-and-security-firefox">Control Center</a> built into Firefox.
             <h2>WebRTC Private IP Address Leak</h2><hr>
-            WebRTC (Web Real-Time Communications) is a technology that enables audio/video streaming and data sharing between two browsers without the need for any plugins. Firefox Hello is one such feature built into Firefox that makes use of WebRTC. Real-Time applications like video calls work best when connection is made directly between the two browsers, producing the lowest latency and the best user experience. In order to establish such direct connections, WebRTC collects every IP address that might be used to reach the browser and exposes it to the outside world.
+            WebRTC (Web Real-Time Communications) is a technology that enables audio/video streaming and data sharing between two browsers without the need for any plug-ins. Firefox Hello is one such feature built into Firefox that makes use of WebRTC. Real-Time applications like video calls work best when connection is made directly between the two browsers, producing the lowest latency and the best user experience. In order to establish such direct connections, WebRTC collects every IP address that might be used to reach the browser and exposes it to the outside world.
             <br><br>
             Many users take online privacy and anonymity very seriously and go to great lengths in order to protect their private information like location, IP address etc. Proxies, VPNs and Tor are some of the most common methods used to fight back against browser fingerprinting and mass surveillance. However, it turns out that WebRTC is one of the weak links in their defenses because it exposes users' public and private IP addresses to websites that they visit (even when WebRTC is <i>not</i> being actively used). Even if a user is not behind a proxy or VPN, he still might find it icky to have a <i>private</i> thing exposed to all websites.
             <br><br>
-            Note that enabling this option will only block private IP address leak due to WebRTC. It will not disable WebRTC completely. Firefox Hello would still be usable as before.
+            To prevent private IP address leak via WebRTC, users can select one of the following 2 options:
+            <h4>Compatible Mode</h4>
+            This option will only block private IP addresses from being exposed to the outside world. It will not disable WebRTC completely. It should not break any websites that directly or indirectly depend on WebRTC. This mode will also restrict WebRTC to be used only on the default interface.
+            <h4>Full Mode</h4>
+            This option will completely disable WebRTC. It will break any websites that directly or indirectly depend on WebRTC.
             <h2>Beacon Data</h2><hr>
             When a user is about to leave a website (by closing the current tab or by navigating to another website), the webpage can send some arbitrary <i>beacon</i> data to the website server. This data is generally used for analytics and diagnostics by the website. Since the user has no control over what information is sent as part of this data, it is open to abuse by website developers and can be used to track and gather information about the users.
             <h2>Proactive Download of Webpage Content</h2><hr>
@@ -92,7 +113,9 @@
             <h4>UI Clutter</h4>
             Firefox UI is <i>lazy loaded</i> which means that the new Pocket feature has no impact on resource or memory usage until it is actually used. Despite that, several users are simply annoyed by the extra UI clutter because they suddenly noticed this extra <i>thing</i> in their toolbar and Bookmarks menu. They feel that it would be more appropriate if the Pocket feature is available as an optional add-on instead of being directly integrated with the browser.
             <h2>Firefox Hello</h2><hr>
-            <a href="https://www.mozilla.org/en-US/firefox/hello/">Firefox Hello</a> is a communication system built into Firefox that allows video conversations between users. Many users find this feature useful but several others feel that a video calling service like Hello is not an essential component of browsing experience and might want to get rid of the extra UI clutter.
+            Firefox Hello is a communication system built into Firefox that allows video conversations between users. Many users find this feature useful but several others feel that a video calling service like Hello is not an essential component of browsing experience and might want to get rid of the extra UI clutter.
+            <br><br>
+            Note that Mozilla stopped including Hello with Firefox from <a href="https://support.mozilla.org/en-US/kb/hello-status">version 49</a> onwards.
             <h2>Reader View</h2><hr>
             The <a href="https://support.mozilla.org/en-US/kb/firefox-reader-view-clutter-free-web-pages">Reader View</a> feature improves readability of web pages by removing clutter like buttons, ads, background images etc. In case a user does not find it useful, the feature can be disabled which will remove its icon from the address bar.       
             <br><br><br>
