@@ -3,7 +3,7 @@
 
 **Note 1: The name of this extension has been changed from 'Fat-Free Firefox' to 'Fat-Free Fox'. This was done to conform to Mozilla's add-on naming policies.**
 
-**Note 2: Fat-Free Fox is compatible with the upcoming multi-process Firefox (Electrolysis).**
+**Note 2: Fat-Free Fox is compatible with [multi-process Firefox](https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox) (Electrolysis).**
 
 This extension offers Firefox users more control, protection and awareness about their browsing experience. It tries to strike a balance between strengthening the browser while keeping it usable at the same time.
 
@@ -28,10 +28,6 @@ The extension can also be used to disable features that users may find unnecessa
 You can install the extension by building it from source or by downloading it from the [Mozilla Add-ons](https://addons.mozilla.org/en-US/firefox/addon/fat-free-firefox/) site.
 
 ## Usage
-To alter a feature, open *Preferences* (Options) for this extension in the *Firefox Add-ons Manager*. You might need to restart Firefox to make the changes fully effective. This *Preferences* page also contains a clickable button which displays detailed information about each of the supported feature.  
+To alter a feature, open *Preferences* (Options) for this extension in the *Firefox Add-ons Manager*. You might need to restart Firefox to make the changes fully effective. This *Preferences* page also contains a clickable button which displays detailed information about each of the supported features.  
   
-![screenshot](https://addons.cdn.mozilla.net/user-media/previews/full/176/176208.png?modified=1468859698)
-  
-***  
-
-Future versions of this extension will include more Firefox features that can be disabled.
+![screenshot](https://addons.cdn.mozilla.net/user-media/previews/full/188/188582.png?modified=1506065304)
