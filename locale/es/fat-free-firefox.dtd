@@ -1,0 +1,46 @@
+<!-- ***** BEGIN LICENSE BLOCK *****
+   -
+   - Copyright (C) 2015 Namit Bhalla (oyenamit@gmail.com)
+   - This file is part of 'Fat-Free Fox' extension for the Firefox browser.
+
+   - This program is free software: you can redistribute it and/or modify
+   - it under the terms of the GNU General Public License as published by
+   - the Free Software Foundation, either version 3 of the License, or
+   - any later version.
+   -
+   - This program is distributed in the hope that it will be useful,
+   - but WITHOUT ANY WARRANTY; without even the implied warranty of
+   - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   - GNU General Public License for more details.
+
+   - You should have received a copy of the GNU General Public License
+   - along with this program. If not, see <http://www.gnu.org/licenses/>.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+
+<!ENTITY fat-free-firefox.prefs.disablePocket               "Deshabilitar Pocket">
+<!ENTITY fat-free-firefox.prefs.disableHello                "Deshabilitar Hello">
+<!ENTITY fat-free-firefox.prefs.disableReader               "Deshabilitar vista de lectura">
+<!ENTITY fat-free-firefox.prefs.disableSpeculativeConn      "Deshabilitar conexiones de red especulativas cuando el ratón pasa sobre un enlace">
+<!ENTITY fat-free-firefox.prefs.disablePushNotifications    "Bloquear que los sitios web impulsen notificaciones dinámicas (push) hacia su pantalla (nueva característica introducida en Firefox 44)">
+<!ENTITY fat-free-firefox.prefs.disableDNSPrefetch          "Deshabilitar consultas DNS proactivas">
+<!ENTITY fat-free-firefox.prefs.disableLinkPrefetch         "Deshabilitar descargas proactivas del contenido de páginas web">
+<!ENTITY fat-free-firefox.prefs.disableWebRTCLeak           "Bloquear la filtración de dirección IP privada debido a WebRTC (aplicable para Firefox 42 y superiores)">
+<!ENTITY fat-free-firefox.prefs.enableTrackingProtection    "Habilitar la protección contra rastreo también para ventanas no privadas (experimental)">
+<!ENTITY fat-free-firefox.prefs.disableBeacon               "No enviar datos de 'baliza' cuando el usuario deja un sitio web">
+<!ENTITY fat-free-firefox.prefs.disableUnifiedComplete      "Deshabilitar entradas 'Visitar ...' y 'Buscar con ...' en la barra de direcciones introducida con Firefox 43">
+
+<!ENTITY fat-free-firefox.prefs.requiresNoRestart           "(el cambio será efectivo inmediatamente, no requiere reinicio)">
+<!ENTITY fat-free-firefox.prefs.requiresRestart             "(el cambio será efectivo después de que reinicie Firefox)">
+<!ENTITY fat-free-firefox.prefs.requiresRestartEx           "(el cambio será completamente efectivo después de que reinicie Firefox)">
+<!ENTITY fat-free-firefox.prefs.requiresNoRestartReload     "(el cambio será efectivo inmediatamente, tan solo vuelva a cargar los sitios abiertos actualmente)">
+<!ENTITY fat-free-firefox.prefs.pushNotificationsDesc       "(deshabilitado por defecto para Firefox 43 y anteriores, no requiere reinicio, tan solo vuelva a cargar los sitios abiertos actualmente)">
+<!ENTITY fat-free-firefox.prefs.trackingProtectionDesc      "(usar con precaución - algunos sitios web pueden no mostrarse adecuadamente, no requiere reinicio)">
+<!ENTITY fat-free-firefox.prefs.docTitle                    "Leer más acerca de las características soportadas">
+<!ENTITY fat-free-firefox.prefs.docDesc                     "(implicaciones de privacidad y otras posibles razones para deshabilitarlas)">
+
+<!-- Dropdown options for WebRTC -->
+<!ENTITY fat-free-firefox.prefs.webRTCEnabled               "No bloquear">
+<!ENTITY fat-free-firefox.prefs.webRTCCompatible            "Modo compatible: Bloquea filtraciones de dirección IP privada (los sitios web no deben resultar afectados)">
+<!ENTITY fat-free-firefox.prefs.webRTCDisabled              "Modo completo: Deshabilita WebRTC por completo (podría causar que algunos sitios web no se carguen adecuadamente)">
