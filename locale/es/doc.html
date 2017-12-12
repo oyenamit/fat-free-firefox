@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+
+<!-- ***** BEGIN LICENSE BLOCK *****
+   -
+   - Copyright (C) 2015 Namit Bhalla (oyenamit@gmail.com)
+   - This file is part of 'Fat-Free Fox' extension for the Firefox browser.
+
+   - This program is free software: you can redistribute it and/or modify
+   - it under the terms of the GNU General Public License as published by
+   - the Free Software Foundation, either version 3 of the License, or
+   - any later version.
+   -
+   - This program is distributed in the hope that it will be useful,
+   - but WITHOUT ANY WARRANTY; without even the implied warranty of
+   - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+   - GNU General Public License for more details.
+
+   - You should have received a copy of the GNU General Public License
+   - along with this program. If not, see <http://www.gnu.org/licenses/>.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+
+<html lang="es">
+    <head>
+        <title>Fat-Free Fox</title>
+        <meta charset="utf-8">
+        <style type="text/css">
+            body {
+                background-color: white;
+                color: black;
+                font-family: sans-serif;
+            }
+            h2 {
+                margin-bottom: 0em;
+                margin-top: 2em;
+                background-color: white;
+                color: MidnightBlue;
+            }
+            h3 {
+                margin-bottom: 0.3em;
+                margin-top: 0.3em;
+                background-color: white;
+                color: MidnightBlue;
+            }
+            h4 {
+                margin-bottom: 0.3em;
+            }
+            table {
+                border: 1px solid lightgray;
+            }
+            td {
+                padding: 10px;
+                vertical-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="width:1000px; margin:0 auto;">
+            <div style="text-align:center"><h1><img src="chrome://fat-free-firefox/skin/fat-free-firefox-icon64.png" alt="" style="vertical-align:middle;margin:0px 20px" ><u>Fat-Free Fox</u></h1></div>
+            <div style="text-align:center"><i>Está viendo esta página bien porque fue abierta desde las preferencias del complemento o porque este complemento acaba de ser instalado/actualizado. Esta página explica algunas de las razones probables para alterar características de Firefox. El objetivo es informar y educar a los usuarios y no extender la desconfianza o el pánico. <u>Esto es Fat-Free Fox versión 3.0</u></i><br><br><br><br></div>
+            <table><tr><td>
+                <h3>Acerca de esta versión</h3>
+                        En Firefox 51, Mozilla <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1297416">cambió su implementación</a> del protocolo WebRTC lo que causó problemas de compatibilidad con Fat-Free Fox. Específicamente, desbarató la característica "Bloquear la filtración de dirección IP privada vía WebRTC" del complemento. Esta versión corrige este problema de compatibilidad e introduce nuevas opciones para evitar la filtración de la dirección IP privada vía WebRTC. Muchas gracias al usuario de Firefox <a href="https://addons.mozilla.org/es/firefox/user/ApprenticeDuck/">Andreas</a> por informar de este problema.
+                </td></tr> </table>
+            <h2>Comportamiento de la búsqueda en la barra de direcciones</h2><hr>
+            En Firefox 43, la barra de direcciones se mejoró con capacidades extra en relación a la búsqueda. Cuando los usuarios escriben algo en la barra de direcciones, al final de la lista desplegable se proporcionan sugerencias de búsqueda relacionadas. Además, Firefox añade una entrada <i>"Visitar www.ejemplo.com"</i> o <i>"Buscar con Google" </i> en la parte superior de la lista desplegable. Los usuarios puede que encuentren estas nuevas <i>características</i> molestas y distrayentes y podrían querer deshabilitarlas por completo.
+            <h2>Notificaciones push por parte de los sitios web</h2><hr>
+            En Firefox 44, se introdujo una nueva característica llamada <a href="https://support.mozilla.org/es/kb/notificaciones-push-en-firefox">Notificaciones push de la web</a> que permite a un sitio web mostrar notificaciones dinámicas a los usuarios incluso cuando el sitio ya no está abierto en el navegador. Por ejemplo, un proveedor de correo electrónico podría mostrar una notificación para informar a los usuarios que se ha recibido un nuevo correo. O, un comercio en línea podría mostrar una notificación cuando un artículo en la lista de deseados está a punto de agotar su stock. El sistema usa servidores mantenidos por Mozilla (Escritorio) o Google (Android) usando aquel mediante el que un sitio pueda impulsar dinámicamente (push) notificaciones hacia la pantalla del usuario, incluso cuando el sitio no está abierto. Una versión básica de esta característica puede verse en acción visitando <a href="https://goroost.com/try-web-push">goroost.com</a>.
+            <br><br>
+			Firefox proporciona opciones a los usuarios para permitir/bloquear estas notificaciones push por sitios. Los usuarios también pueden bloquear temporalmente las notificaciones de todos los sitios para la sesión actual de Firefox; cuando Firefox se reinicie, las notificaciones se habilitarán de nuevo. Sin embargo, varios usuarios podrían preferir un navegador más callado y podrían querer deshabilitar todas esas notificaciones de todos los sitios web, incluso después de que Firefox se reinicie.
+            <br><br>
+            Observe que para Firefox 43 e inferiores, las notificaciones push fueron desactivadas por Firefox (esta opción estaría seleccionada por defecto en las preferencias de Fat-Free-Fox).
+            <h2>Protección contra rastreo para ventanas no-privadas</h2><hr>
+            La mayoría de los sitios web y servicios en línea que son percibidos como gratuitos por los usuarios no lo son en el auténtico sentido. A cambio del contenido web gratuito, estos sitios permiten que terceros anunciantes recopilen datos privados de los usuarios, como ubicación, direcciones de correo electrónico, áreas de intereses, gustos y aversiones, hábitos de navegación, etc. Los anunciantes usan estos datos para identificar visitantes de forma única, elaborar un perfil y hacerle un seguimiento cuando navega por la web recorriendo distintos sitios web. Estos perfiles de navegación pueden ser muy específicos y asombrosamente reveladores - madres con niños pequeños o una persona con afiliación al Partido Demócrata. Esta <a href="http://www.pwc.com/gx/en/industries/entertainment-media/outlook/segment-insights/internet-advertising.html">industria del marketing digital de decenas de miles de millones de dólares</a> ha causado que actividades aparentemente mundanas, como ir de compras, charlar y viajar, sean registradas constantemente, analizadas y monetizadas.
+            <br><br>
+            Mientras el usuario sea un participante voluntario, esta clase de rastreo puede ser algo bueno. Por ejemplo, los comerciantes en línea pueden ajustar sus sitios web a las necesidades del usuario y asegurar que sea más probable que vea publicidad de productos y servicios relevantes para sus intereses; los sitios de descubrimiento de restaurantes pueden ofrecer a sus usuarios una experiencia individualizada basada en su ubicación y preferencias pasadas. El problema es que la mayoría de esta información ha sido recopilada en secreto sin dejarle claro a los usuarios qué es lo que se está recopilando y cómo se está usando esa información. Un <a href="http://techcrunch.com/2015/06/06/the-online-privacy-lie-is-unraveling/">informe</a> reciente sobre la actitud de los consumidores de EEUU hacia esta recopilación de datos personales ha revelado que la mayoría de los usuarios se siente impotente contra este ubiquo "gran hermano", como las redes publicitarias, que siempre está vigilándoles por encima del hombro.
+            <br><br>
+            Firefox <a href="https://blog.mozilla.org/blog/2015/11/03/firefox-now-offers-a-more-private-browsing-experience/">introdujo una característica de protección contra  rastreo</a> en la versión 42 con la que bloquearía contenido de terceros como publicidad, rastreadores para analíticas y botones para compartir en medios sociales, que pueden registrar el comportamiento de los usuarios sin su conocimiento. Esta protección contra rastreo integrada es similar en su naturaleza a la proporcionada por extensiones populares como <a href="https://addons.mozilla.org/es/firefox/addon/adblock-plus/">Adblock Plus</a> y <a href="https://addons.mozilla.org/es/firefox/addon/ublock-origin/">uBlock Origin</a>. Sin embargo, Firefox habilita por defecto esta característica sólo para <a href="https://support.mozilla.org/es/kb/navegacion-privada-con-proteccion-contra-rastreo">ventanas de navegación privada</a>. Muchos usuarios concernidos con la publicidad podrían desear beneficiarse de esta protección también en ventanas no-privadas. Además, los usuarios pueden seleccionar entre protección <i>Básica</i> y <i>Estricta</i> en las preferencias de Firefox.
+            <br><br>
+            <b>PRECAUCIÓN</b>: Con la protección contra rastreo habilitada, algunas páginas pueden aparecer desbaratadas ya que la publicidad que rastrea el comportamiento está bloqueada. Los usuarios pueden deshabilitar por sitios la protección contra rastreo usando el <a href="https://support.mozilla.org/es/kb/centro-de-control-administra-la-configuracion-de-privacidad-seguridad-pagina">Centro de control</a> integrado en Firefox.
+            <h2>Filtración de dirección IP privada vía WebRTC</h2><hr>
+            WebRTC (Comunicaciones en Tiempo Real por la Web) es una tecnología que habilita el streaming de audio/vídeo y compartir datos entre dos navegadores sin necesidad de ningún complemento. Firefox Hello es una de estas características integrada en Firefox que hace uso de WebRTC. Las aplicaciones en Tiempo-Real, como las vídeo-llamadas, funcionan mejor cuando la conexión se realiza directamente entre dos navegadores, produciendo la latencia más baja y la mejor experiencia para el usuario. Para establecer estas conexiones directas, WebRTC recopila cada dirección IP que podría usarse para alcanzar el navegador local y las expone al mundo exterior.
+            <br><br>
+            Muchos usuarios se toman la privacidad en línea y el anonimato muy en serio, y realizan grandes esfuerzos para proteger su información privada, como ubicación, dirección IP, etc. Proxys, VPNs y Tor son algunos de los métodos más comunes usados para contrarrestar el perfilamiento del navegador y la vigilancia masiva. Sin embargo, resulta que WebRTC es uno de los eslabones débiles en sus defensas porque expone las direcciones IP pública y privada de los usuarios a los sitios web visitados (hasta cuando WebRTC <i>no</i> se está usando de forma activa). Incluso si un usuario no se encuentra detrás de un proxy o VPN, aún podría encontrar repulsivo tener algo <i>privado</i> expuesto a todos los sitios web.
+            <br><br>
+            Para prevenir la filtración de la dirección IP privada vía WebRTC, los usuarios pueden seleccionar una de las dos opciones siguientes:
+            <h4>Modo compatible</h4>
+            Esta opción sólo impedirá que se expongan al mundo exterior las direcciones IP privadas. No deshabilitará WebRTC por completo. No debe desbaratar ningún sitio web que dependa directa o indirectamente de WebRTC. Este modo también restringirá WebRTC para que se use sólo sobre la interfaz predeterminada.
+            <h4>Modo completo</h4>
+            Esta opción deshabilitará WebRTC por completo. Desbaratará cualquier sitio web que dependa directa o indirectamente de WebRTC.
+            <h2>Datos de balizamiento</h2><hr>
+			Cuando un usuario está a punto de dejar un sitio web (cerrando la pestaña actual o navegando a otro sitio web), la página web puede enviar algunos datos de <i>balizamiento</i> arbitrarios al servidor web. Estos datos generalmente se usan para analíticas y diagnósticos por parte del sitio web. Como el usuario no tiene control sobre qué información se envía como parte de estos datos, esto queda abierto al abuso por parte de los desarrolladores de sitios web y se puede usar para rastrear y reunir información acerca de los usuarios.
+            <h2>Descarga proactiva del contenido de la página web</h2><hr>
+            Cuando un usuario visita una página web, el creador de la página puede anticipar qué enlaces pulsará el usuario en su siguiente visita. En base a esta anticipación, la página web puede proporcionar una lista de contenidos web (páginas html, imágenes, etc.) a Firefox de forma que se pueden descargar en segundo plano incluso antes de que el usuario pulse esos enlaces. Cuando Firefox esté desocupado, <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Link_prefetching_FAQ">descargará en silencio</a> ese contenido y lo almacenará en su caché. Si el usuario finalmente pulsa sobre esos enlaces, se pueden cargar rápidamente desde la caché. Esta técnica puede ser útil para acelerar los tiempos de carga de una página web, por ejemplo, si la página siguiente tiene varias imágenes grandes.
+            <br><br>
+			Sin embargo, este mecanismo de anticipación también puede llevar a problemas de privacidad y seguridad porque Firefox podría descargar páginas web, imágenes y cookies sin conocimiento del usuario, desde sitios que este podría no visitar nunca. Si el usuario tiene servicios de acceso a Internet tarificados por volumen, podría terminar pagando por descargas que nunca solicitó ni usó. Para un sitio web malicioso es posible abusar de esta característica y descargar malware de forma silenciosa al sistema del usuario (descargas de pasada/drive-by). Además, los usuarios pueden violar inadvertidamente las políticas sobre Internet de su organización si tales descargas proactivas acceden a contenido no autorizado.
+            <h2>Búsquedas DNS proactivas</h2><hr>
+            Cuando un usuario carga un sitio web, Firefox contacta con un <i>Servidor de Nombres de Dominio</i> (DNS) para mapear el nombre del sitio web (digamos, www.ejemplo.com) hacia su dirección IP (digamos, 93.184.216.119). A esto se le llama <i>consulta DNS</i> o <i>resolución</i>. Usando esta dirección IP, Firefox establece una conexión de red al sitio web y carga sus páginas.
+            <br><br>
+            Para hacer que el tiempo de carga de la página parezca más rápido, Firefox usa un mecanismo de consulta DNS proactivo. Cuando el usuario se encuentra navegando en una página web que tiene enlaces apuntando a otro sitio web (digamos, www.google.com), Firefox especula que el usuario pulsará en uno de esos enlaces y realiza una consulta DNS para <i>cada uno de ellos</i> por adelantado. Mientras los beneficios prácticos de tales mejoras especulativas del rendimiento podrían ser <a href="http://bitsup.blogspot.in/2008/11/dns-prefetching-for-firefox.html">minúsculas</a>, los expertos coinciden en que tales prácticas podrían llevar a brechas en la privacidad que son <a href="https://www.usenix.org/event/leet10/tech/full_papers/Krishnan.pdf">fruto maduro para el abuso</a> (PDF).
+            <h2>Conexiones de red especulativas</h2><hr>
+			En ciertos escenarios, Firefox usa un mecanismo de <i>conexión especulativa</i> para mejorar el tiempo de carga de sitios web. Por ejemplo, cuando un usuario se sitúa en la página <i>Nueva pestaña</i> con el ratón sobre las miniaturas de página, Firefox abre una conexión de red al servidor del sitio web para <i>prepararse</i>, de forma que si el usuario de hecho pulsa el enlace, la velocidad global de carga de la página es más rápida. Otro escenario para el que Firefox hace lo mismo es cuando el usuario comienza a buscar en la <i>Barra de búsqueda</i>, o en el campo de búsqueda en la página de <i>Inicio</i> o en la página <i>Nueva pestaña</i>; esta conexión predictiva envía sólo la <i>dirección IP</i> del usuario al servidor del sitio web, no se envía ninguna petición para cargar la página, no se envía ningún otro dato específico del usuario (dirección de correo electrónico, contraseña, etc.).
+            <br><br>
+			Se ha <a href="http://news.slashdot.org/story/15/08/14/2321202/how-to-quash-firefoxs-silent-requests">informado</a> (y también confirmado independientemente por el autor de este complemento) que en realidad las conexiones especulativas no están limitadas a los pocos escenarios mencionados arriba. Cuando un usuario sitúa su ratón sobre <b>cualquier</b> enlace normal de un sitio web, Firefox parece abrir además conexiones especulativas para esos enlaces. La <a href="https://support.mozilla.org/es/kb/como-conseguir-que-firefox-deje-de-realizar-conexi#w_pre-conexiones-especulativas">documentación de Mozilla</a> para esta característica no menciona nada acerca de que los enlaces normales también se estén usando para conexiones especulativas. Es más, Mozilla no ha proporcionado ningún dato concreto que cuantifique cuánta mejora del rendimiento se observa realmente con las conexiones predictivas. <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=790882#c34">Estos</a> <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=790882#c36">comentarios</a> <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=790882#c37">indican</a> que tales tests comparativos nunca se llevaron a cabo.
+            <br><br>
+			Aunque muchos usuarios pueden estar cómodos con que su dirección IP sea compartida con sitios web que nunca pretendieron visitar, varios usuarios han <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=814169#c31">expresado</a> su <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=814169#c22">preocupación</a> de que esto constituya una violación de su privacidad. Normalmente <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=814169#c20">los usuarios sitúan su ratón sobre un enlace</a> para saber a dónde apunta realmente este, y luego decidir si sería seguro pulsarlo o no. Con las conexiones especulativas habilitadas, Firefox se comunica en silencio con el servidor del sitio web y comparte la dirección IP de los usuarios. Potencialmente este comportamiento puede permitir que los distribuidores de correo spam <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=814169#c18">rastreen</a> a sus víctimas, confirmar que sus direcciones de correo electrónico están <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=814169#c32">activas</a> y enviarles todavía más spam. Muchos usuarios sienten que tales violaciones de privacidad son un enorme precio a pagar por mejoras especulativas de rendimiento no cuantificables.
+            <h2>Pocket&trade; para Firefox</h2><hr>
+            <a href="https://support.mozilla.org/es/kb/guarda-paginas-leer-despues-pocket-firefox">Pocket para Firefox</a> es una característica que permite a los usuarios guardar páginas web con un solo clic y leerlas más tarde. Aunque varios usuarios encuentran útil esta característica, otros sienten que es un añadido indeseado e innecesario a Firefox por las siguientes razones:   
+            <h4>Implicaciones de privacidad</h4>
+            Pocket es un <a href="https://getpocket.com/">servicio perteneciente a terceros</a> integrado en Firefox. Cuando los usuarios inician sesión en Pocket, su dirección de correo electrónico se comparte implícitamente con la compañía Pocket. Cuando los usuarios guardan páginas web para uso posterior, sus gustos y áreas de interés se almacenan en los servidores de esta compañía. Es bastante plausible que esta información personal y hábitos de navegación sean vendidos o transferidos por Pocket a otra compañía en el futuro. Muchos usuarios pueden no comprender completamente a dónde están yendo sus datos personales porque confían tácitamente en Mozilla, y la característica Pocket está empaquetada con el navegador. Cuando Mozilla publicó Pocket, hicieron dejadez en informar y educar a los usuarios acerca de que Pocket no es un servicio de Mozilla sino que es propiedad de terceros cuya <a href="https://getpocket.com/privacy">política de privacidad</a> es diferente de la de <a href="https://www.mozilla.org/es-ES/privacy/">Mozilla</a>. Esto es una divergencia significativa del compromiso de Mozilla con <a href="https://www.mozilla.org/es-ES/about/manifesto/">la apertura y la transparencia</a>. Muchos usuarios sensibles a la privacidad sienten que añadir silenciosamente un servicio propietario a un software de código abierto como Firefox va contra el espíritu de una web libre, abierta y neutral.      
+            <h4>Desorden en la interfaz de usuario</h4>
+            La interfaz de usuario de Firefox es de <i>carga perezosa</i> lo que significa que la nueva característica Pocket no tiene impacto en uso de recursos o de memoria hasta que se usa de hecho. A pesar de eso, varios usuarios están molestos simplemente por este estorbo extra en la interfaz de usuario, porque se han dado cuenta de repente de la presencia de esta <i>cosa</i> extra en su barra de herramientas y su menú de Marcadores. Sienten que sería más adecuado si la característica Pocket estuviera disponible como un complemento opcional en lugar de ser integrado directamente en el navegador.
+            <h2>Firefox Hello</h2><hr>
+            Firefox Hello es un sistema de comunicación integrado en Firefox que permite conversaciones de vídeo entre los usuarios. Muchos usuarios encuentran útil esta característica, pero varios otros sienten que un servicio de vídeo-llamada como Hello no es un componente esencial de la experiencia de navegación y podrían querer librarse de este estorbo extra en la interfaz de usuario.
+            <br><br>
+			Observe que Mozilla dejo de incluir Hello junto a Firefox desde la <a href="https://support.mozilla.org/es/kb/alternativas-hello-cuando-desaparezca-en-la-version-49-firefox">versión 49</a> en adelante.
+            <h2>Vista de lectura</h2><hr>
+            La <a href="https://support.mozilla.org/es/kb/disfruta-leyendo-paginas-web-con-la-vista-de-lectura">Vista de lectura</a> mejora la legibilidad de páginas web eliminando estorbos como botones, publicidad, imágenes en segundo plano, etc. En caso de que un usuario no la encuentre útil, la característica se puede deshabilitar, lo que eliminará su icono de la barra de direcciones.       
+            <br><br><br>
+            <div style="text-align:right">
+                <img style="border:0;width:88px;height:31px;vertical-align:middle;margin:0px 5px"
+                src="http://www.w3.org/Icons/valid-html401-blue"
+                alt="">
+
+                <img style="border:0;width:88px;height:31px;vertical-align:middle;margin:0px 5px"
+                src="http://jigsaw.w3.org/css-validator/images/vcss-blue"
+                alt="">
+            </div>
+        </div>
+    </body>
+</html>
