@@ -22,4 +22,5 @@
 content     fat-free-firefox                    content/
 skin        fat-free-firefox     classic/1.0    skin/
 locale      fat-free-firefox     en-US          locale/en-US/
+locale      fat-free-firefox     es             locale/es/
 
