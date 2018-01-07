@@ -58,6 +58,17 @@
               <em:translator>oyenamit</em:translator>
           </Description>
       </em:localized>
+
+      <!-- Spanish localization -->
+      <em:localized>
+          <Description>
+              <em:locale>es</em:locale>
+              <em:name>Fat-Free Fox</em:name>
+              <em:description>Salvaguarda su información privada deshabilitando caracterísicas que violan la privacidad de Firefox y habilitando protección contra el rastreo realizado por publicidad de terceros. Mantiene su navegador desgrasado deshabilitando algunas de sus características no deseadas.</em:description>
+              <em:creator>oyenamit</em:creator>
+              <em:translator>strel</em:translator>
+          </Description>
+      </em:localized>
   </Description>
 </RDF>
 
